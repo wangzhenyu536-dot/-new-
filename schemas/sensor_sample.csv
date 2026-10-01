@@ -1,0 +1,4 @@
+session_id,device_id,modality,timestamp_ms,sequence,channel,value,signal_quality,sampling_rate_hz
+SAMPLE001,EMG01,emg,0,1,emg_1,0.013,0.92,500
+SAMPLE001,EEG01,eeg,0,1,eeg_raw,427,0.78,512
+

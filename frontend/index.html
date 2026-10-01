@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="EVERTRACE turns text, voice, images, and optional physiological data into a wisdom pack you review and own.">
+  <meta name="theme-color" content="#050505">
+  <title>EVERTRACE — Human Wisdom, Structured.</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23050505'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='white' stroke-width='3' stroke-dasharray='78 35'/%3E%3Ccircle cx='32' cy='32' r='3' fill='%23ff542e'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="is-loading">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <section id="loader" class="loader" aria-label="Website loading">
+    <div class="loader-core">
+      <div class="loader-meta"><span>EVERTRACE / HUMAN WISDOM ARCHIVE</span><span id="loadingNumber">000</span></div>
+      <div class="loader-track"><span id="loadingBar"></span></div>
+    </div>
+    <p class="loader-intent">EVERY LIFE HOLDS KNOWLEDGE THAT DESERVES<br>TO BE HEARD, STRUCTURED, AND PASSED ON.</p>
+    <button id="skipIntro" class="loader-skip">SKIP INTRO</button>
+  </section>
+
+  <div id="site" class="site" aria-hidden="true">
+    <header class="nav" id="nav">
+      <a class="wordmark" href="#archive"><span class="wordmark-cn">EVERTRACE</span><span class="wordmark-en">®</span></a>
+      <nav aria-label="Primary navigation"><a href="#archive">ARCHIVE</a><a href="#process">PROCESS</a><a href="#signals">SIGNALS</a><a href="#privacy">PRIVACY</a></nav>
+      <div class="nav-actions"><button class="text-button" data-open="login">SIGN IN</button><button class="button button-small" data-open="register">START A PACK <i></i></button></div>
+      <button id="menuButton" class="menu-button" aria-expanded="false" aria-label="Open menu"><span></span><span></span></button>
+    </header>
+
+    <main id="main">
+      <section id="archive" class="archive-hero section-light">
+        <div class="micro-row"><span>001 — COLLECTIVE WISDOM</span><span>MOVE TO EXPLORE</span><span>PRIVATE BY DEFAULT</span></div>
+        <div id="portraitStage" class="portrait-stage" aria-label="A visual archive of experience and wisdom from Chinese people">
+          <img src="assets/wisdom-portraits.png" alt="A monochrome editorial collage of Chinese people across generations and fields of practice">
+          <div class="portrait-more" aria-hidden="true">SEE MORE <span>↗</span></div>
+          <button class="archive-point point-a" data-note="A craft learned through repetition">01</button>
+          <button class="archive-point point-b" data-note="A decision remembered years later">02</button>
+          <button class="archive-point point-c" data-note="A life carried in gesture and voice">03</button>
+        </div>
+        <div class="hero-title-wrap"><h1>Human wisdom<br>does not arrive<br>as data.</h1><p class="hero-chinese">Every person carries experience no form can fully contain.<br>EVERTRACE begins with the telling—and lets its structure emerge.</p></div>
+        <div class="hero-footer"><p>NOT A PERSONALITY TEST.<br>NOT A MIND-READING DEVICE.</p><p>TEXT / VOICE / IMAGE<br>EEG + EMG OPTIONAL</p><a class="arrow-link" href="#studio">CREATE YOUR FIRST PACK <span>↘</span></a></div>
+      </section>
+
+      <section class="statement section-dark">
+        <div class="index-label">002 — THE INTENT</div>
+        <h2>WHAT YOU LIVED<br>CAN BECOME<br><span>WHAT OTHERS LEARN.</span></h2>
+        <div class="statement-grid"><p>EVERTRACE is a system for collecting and preserving human experience. Tell a story naturally, then add voice, images, or optional physiological signal records.</p><p>The Agent asks only what matters most, with no more than three gentle questions. What remains unsaid stays open. The final meaning always belongs to you.</p></div>
+      </section>
+
+      <section id="process" class="process section-light">
+        <div class="section-heading"><span>003 — PROCESS</span><h2>FROM EXPERIENCE<br>TO WISDOM PACK.</h2></div>
+        <ol class="process-list">
+          <li data-accent="none"><span>01</span><strong>REGISTER</strong><p>Create a private archive. No legal name is required, and everything begins private.</p><i>IDENTITY</i></li>
+          <li data-accent="event"><span>02</span><strong>TELL</strong><p>Speak or write naturally. You do not need to prepare, and there is no correct answer.</p><i>EXPERIENCE</i></li>
+          <li data-accent="decision"><span>03</span><strong>CLARIFY</strong><p>The Agent asks no more than three questions, one at a time. You may always skip.</p><i>≤ 3 QUESTIONS</i></li>
+          <li data-accent="scene"><span>04</span><strong>REVIEW</strong><p>Review the AI draft, correct misunderstandings, and choose which interpretations remain.</p><i>YOUR CONTROL</i></li>
+          <li data-accent="skill"><span>05</span><strong>ARCHIVE</strong><p>Confirm a readable, searchable, and shareable standard wisdom pack.</p><i>CONFIRMED</i></li>
+        </ol>
+      </section>
+
+      <section class="materials section-dark">
+        <div class="materials-copy"><span class="index-label">004 — MATERIALS OF MEMORY</span><h2>AN EXPERIENCE<br>LEAVES MORE<br>THAN WORDS.</h2><p>Each medium adds another dimension, but no single signal can define a person.</p></div>
+        <figure class="still-life"><img src="assets/wisdom-still-life.png" alt="A monochrome still life of maps, notebooks, a recorder, tools, and working hands"><figcaption>FIELD NOTES / VOICE / OBJECTS / CRAFT</figcaption></figure>
+        <div class="material-index">
+          <button data-material="text"><span>01</span><strong>TEXT</strong><em>WHAT WAS SAID</em></button>
+          <button data-material="audio"><span>02</span><strong>AUDIO</strong><em>HOW IT WAS TOLD</em></button>
+          <button data-material="image"><span>03</span><strong>IMAGE</strong><em>WHAT WAS VISIBLE</em></button>
+          <button data-material="signal"><span>04</span><strong>SIGNAL</strong><em>WHAT CHANGED OVER TIME</em></button>
+        </div>
+        <p id="materialNote" class="material-note">Text carries the facts, feelings, and choices a person explicitly shares. It is the primary source of meaning.</p>
+      </section>
+
+      <section id="signals" class="signals section-light">
+        <div class="signal-heading">
+          <span>005 — BIO-SIGNAL CAPTURE</span>
+          <h2>RECORD THE<br>BODY IN TIME.</h2>
+          <p>Collect EEG and EMG with your device during an experience, then upload the files for offline analysis. Signals add timing and intensity context—they never define what a person thought or felt.</p>
+        </div>
+        <div class="signal-console">
+          <div class="signal-console-top"><span>OFFLINE SIGNAL DESK</span><span id="signalDeskStatus">AWAITING DATA</span></div>
+          <article class="signal-channel" data-signal-card="eeg">
+            <div class="signal-channel-copy"><span>CHANNEL 01</span><h3>EEG</h3><p>TGAM ThinkGear · forehead electrode</p></div>
+            <div class="signal-wave" aria-label="Illustrative EEG waveform preview">
+              <svg viewBox="0 0 600 120" role="img"><path d="M0 62L26 60L45 67L60 28L75 91L95 57L130 62L158 59L175 66L188 36L203 84L220 62L254 60L276 64L292 20L308 99L324 55L360 61L389 58L406 70L421 41L439 79L458 61L493 60L520 65L538 31L552 91L570 58L600 62"/></svg>
+              <small>ILLUSTRATIVE PREVIEW</small>
+            </div>
+            <div class="signal-upload"><span id="eegFileName">NO EEG FILE</span><label>UPLOAD EEG<input type="file" data-signal-input="eeg" accept=".csv,.json,.txt"></label></div>
+          </article>
+          <article class="signal-channel" data-signal-card="emg">
+            <div class="signal-channel-copy"><span>CHANNEL 02</span><h3>EMG</h3><p>AD8232 · three-electrode muscle channel</p></div>
+            <div class="signal-wave" aria-label="Illustrative EMG waveform preview">
+              <svg viewBox="0 0 600 120" role="img"><path d="M0 63L52 62L74 59L91 65L107 24L119 98L130 38L145 79L160 55L179 66L202 61L242 62L265 58L280 68L294 17L305 104L317 31L330 88L343 51L360 70L382 60L430 62L455 59L470 66L484 27L497 95L511 36L526 82L541 54L558 68L579 61L600 62"/></svg>
+              <small>ILLUSTRATIVE PREVIEW</small>
+            </div>
+            <div class="signal-upload"><span id="emgFileName">NO EMG FILE</span><label>UPLOAD EMG<input type="file" data-signal-input="emg" accept=".csv,.json,.txt"></label></div>
+          </article>
+          <div class="signal-metrics">
+            <div><span>FILES READY</span><strong id="signalFileCount">00</strong></div>
+            <div><span>TOTAL SIZE</span><strong id="signalTotalSize">0 KB</strong></div>
+            <div><span>ANALYSIS</span><strong>OFFLINE</strong></div>
+            <div><span>INTERPRETATION</span><strong>DESCRIPTIVE ONLY</strong></div>
+          </div>
+          <p class="signal-boundary"><strong>INTERPRETATION BOUNDARY</strong> Signal quality, timestamps, relative change, and event markers may be retained as metadata. EVERTRACE does not use EEG or EMG to infer emotion, personality, truthfulness, thoughts, or medical conditions.</p>
+        </div>
+      </section>
+
+      <section id="privacy" class="privacy section-light">
+        <div class="privacy-title"><span>006 — YOUR TERMS</span><h2>PRIVATE<br>UNTIL YOU<br>SAY OTHERWISE.</h2></div>
+        <div class="privacy-rules">
+          <article><span>01</span><h3>DEFAULT PRIVATE</h3><p>New sessions and wisdom packs remain private and are never published automatically.</p></article>
+          <article><span>02</span><h3>EDIT BEFORE ARCHIVE</h3><p>AI creates a draft. You review, edit, and confirm the final version.</p></article>
+          <article><span>03</span><h3>NO MIND READING</h3><p>EEG, EMG, and images provide descriptive evidence only—not claims about thoughts, personality, or emotion.</p></article>
+          <article><span>04</span><h3>DELETE OR EXPORT</h3><p>Download, edit, or delete your sessions, evidence, and wisdom packs at any time.</p></article>
+        </div>
+      </section>
+
+      <section id="studio" class="studio section-dark">
+        <div class="studio-header"><div><span>007 — WISDOM STUDIO</span><h2>START WITH<br>ONE MEMORY.</h2></div><div class="studio-status"><i></i><span id="mode">CONNECTING</span></div></div>
+        <section id="startView" class="studio-start">
+          <label for="story">Which experience would you like to preserve?</label>
+          <textarea id="story" rows="6" placeholder="You can begin with “There was a time...” No preparation needed."></textarea>
+          <div class="studio-controls"><div class="consent-inline"><span>PRIVATE SESSION</span><span>3 QUESTIONS MAX</span><span>YOU MAY SKIP</span></div><button id="startBtn" class="button button-light">BEGIN THE INTERVIEW <span>↗</span></button></div>
+        </section>
+        <section id="sessionView" class="session-view hidden">
+          <aside class="session-rail"><div><span>SESSION</span><strong id="sessionCode">—</strong></div><div><span>INTERVIEW</span><strong><b id="used">0</b> / 3</strong></div><div id="questionTrack" class="question-track"><i></i><i></i><i></i></div><button id="newBtn" class="link-button">NEW SESSION</button></aside>
+          <article class="interview-sheet"><div class="interview-top"><span id="title">MY EXPERIENCE RECORD</span><span>AUTOSAVED</span></div><div id="messages" class="messages" aria-live="polite"></div><div class="composer"><label for="answer">YOUR RESPONSE</label><textarea id="answer" rows="3" placeholder="Share whatever comes to mind."></textarea><div class="composer-actions"><div><button id="skipBtn" class="link-button">LEAVE THIS OPEN</button><button id="finishBtn" class="link-button">FINISH HERE</button></div><button id="answerBtn" class="button button-light">CONTINUE <span>↗</span></button></div></div></article>
+          <aside class="evidence-rail"><div class="rail-title"><span>MATERIAL INDEX</span><b>OPTIONAL</b></div><label class="evidence-add">ADD MATERIAL +<input id="file" type="file" multiple accept="image/*,audio/*,.csv,.json,.txt"></label><div id="files" class="files">NO MATERIAL ADDED</div><p id="hint">You may finish at any time. What remains unsaid will stay open.</p><button id="packageBtn" class="button button-package" disabled>GENERATE WISDOM PACK</button></aside>
+        </section>
+      </section>
+
+      <section class="finale section-light"><div class="finale-line"><span>EVERTRACE / 2026</span><span>HUMAN WISDOM ARCHIVE</span><span>08 / 08</span></div><h2>ONE LIFE.<br>COUNTLESS FORMS<br>OF KNOWING.</h2><button class="button button-dark" data-scroll-studio>CREATE YOUR FIRST PACK <i></i></button></section>
+    </main>
+
+    <footer><a class="wordmark footer-wordmark" href="#archive"><span class="wordmark-cn">EVERTRACE</span><span class="wordmark-en">®</span></a><p>HUMAN WISDOM, STRUCTURED.<br>NOT FOR MEDICAL DIAGNOSIS.</p><div><a href="#process">PROCESS</a><a href="#privacy">PRIVACY</a><button data-open="register">REGISTER</button></div></footer>
+  </div>
+
+  <dialog id="accountDialog" class="account-dialog">
+    <button class="dialog-close" data-close aria-label="Close">×</button>
+    <div class="dialog-index"><span id="accountStepLabel">REGISTER / 01 OF 03</span><span>PRIVATE ACCOUNT</span></div>
+    <form id="accountForm">
+      <section class="account-step active" data-step="1"><h2>BEGIN<br>IN BLACK<br>AND WHITE.</h2><label>EMAIL<input id="accountEmail" type="email" required placeholder="you@example.com"></label><label>DISPLAY NAME <small>OPTIONAL</small><input id="accountName" type="text" placeholder="Your legal name is not required"></label></section>
+      <section class="account-step" data-step="2"><h2>YOUR DATA.<br>YOUR TERMS.</h2><label class="check"><input type="checkbox" required><span>I understand that new content is private by default.</span></label><label class="check"><input type="checkbox" required><span>I can delete or export my information at any time.</span></label><label class="check"><input type="checkbox" required><span>Physiological signals will not be used for mind reading or medical diagnosis.</span></label></section>
+      <section class="account-step" data-step="3"><h2>YOUR FIRST<br>TRACE OF<br>COLOR.</h2><p>Choose a private identifying color. It personalizes the interface and says nothing about your personality.</p><div class="color-choices" role="radiogroup"><button type="button" data-color="#ff542e" aria-label="Vermilion"></button><button type="button" data-color="#3f7368" aria-label="Deep green"></button><button type="button" data-color="#516f9a" aria-label="Blue gray"></button><button type="button" data-color="#a66b8f" aria-label="Muted violet"></button><button type="button" data-color="#c3973b" aria-label="Ochre"></button></div></section>
+      <div class="dialog-actions"><button type="button" id="accountBack" class="link-button" disabled>BACK</button><button type="submit" id="accountNext" class="button button-dark">CONTINUE <span>↗</span></button></div>
+    </form>
+  </dialog>
+
+  <dialog id="result" class="result-dialog"><button class="dialog-close" id="close" aria-label="Close">×</button><div class="pack-meta"><span>WISDOM PACK</span><span id="packStatus">AI DRAFT / NOT CONFIRMED</span></div><div id="preview" class="pack-preview"></div><p id="folder" class="folder"></p><div class="pack-actions"><button class="link-button" id="downloadPack">DOWNLOAD JSON</button><button class="button button-dark" id="confirmPack">CONFIRM & ARCHIVE</button></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

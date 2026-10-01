@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "SAMPLE001",
+  "timezone": "Asia/Shanghai",
+  "started_at": "2026-08-12T10:00:00+08:00",
+  "devices": [
+    {"device_id":"EMG01","model":"AD8232","modality":"emg","sampling_rate_hz":500,"channels":["emg_1"]},
+    {"device_id":"EEG01","model":"TGAM ThinkGear","modality":"eeg","sampling_rate_hz":512,"channels":["eeg_raw"]},
+    {"device_id":"CAM01","model":"ESP32-CAM OV2640","modality":"image"},
+    {"device_id":"MIC01","model":"INMP441","modality":"audio","sampling_rate_hz":16000}
+  ],
+  "clock": {"source":"esp32_monotonic_ms","estimated_sync_error_ms":null},
+  "consent": {"owner_confirmed":false,"allowed_uses":["private_personal_record"]}
+}
+

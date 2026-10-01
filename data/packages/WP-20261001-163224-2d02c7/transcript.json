@@ -1,0 +1,42 @@
+[
+  {
+    "role": "user",
+    "content": "我做了十二年木工，最重要的一课是：榫卯对不齐时不要硬敲，要回头量基准面。",
+    "created_at": "2026-10-01T16:31:58+08:00"
+  },
+  {
+    "role": "agent",
+    "content": "What detail from this experience stayed with you most?",
+    "created_at": "2026-10-01T16:31:58+08:00"
+  },
+  {
+    "role": "user",
+    "content": "记得最清的是硬敲裂了一块老榆木，那块料找不回来了。",
+    "created_at": "2026-10-01T16:32:12+08:00"
+  },
+  {
+    "role": "agent",
+    "content": "What did you do in response, if anything?",
+    "created_at": "2026-10-01T16:32:12+08:00"
+  },
+  {
+    "role": "user",
+    "content": "I would like to leave this part open.",
+    "created_at": "2026-10-01T16:32:12+08:00"
+  },
+  {
+    "role": "agent",
+    "content": "Where did this experience leave off for you?",
+    "created_at": "2026-10-01T16:32:12+08:00"
+  },
+  {
+    "role": "user",
+    "content": "现在我教徒弟第一件事就是量基准面，不许上手敲。",
+    "created_at": "2026-10-01T16:32:12+08:00"
+  },
+  {
+    "role": "user",
+    "content": "多说一句，基准面要选最平的一面。",
+    "created_at": "2026-10-01T16:32:12+08:00"
+  }
+]
