@@ -30,7 +30,10 @@
     "build:shared": "npm run build --workspace @evertrace/shared",
     "test:unit": "vitest run tests/unit",
     "fixtures": "node scripts/generate-fixtures.mjs",
-    "predev": "npm run build:shared"
+    "predev": "npm run build:shared",
+    "uploads:cleanup": "npm run build:functions && node scripts/cleanup-local.mjs",
+    "preverify": "node scripts/snapshot-preview.mjs",
+    "preview:snapshot": "node scripts/snapshot-preview.mjs"
   },
   "devDependencies": {
     "node": "22.23.3",

@@ -161,12 +161,12 @@
     "membersTitle": "团队成员",
     "membersHint": "成员管理和角色调整将在 R8 实现。",
     "connected": "你的账户已连接到团队资料库。",
-    "workspaceNext": "R3 开放保存与团队浏览。",
+    "workspaceNext": "R4 将提供多附件与编辑。",
     "workspaceNav": "工作区导航"
   },
   "form": {
     "intro": "填写技能资料，添加文本和单通道脑电 Excel，检查材料是否完整。",
-    "templateNotice": "建议模板 · 尚待真实设备样例确认。仅在本机预检，文件不会上传。",
+    "templateNotice": "建议模板 · 尚待真实设备样例确认。本地演示文件仅在点击保存后上传。",
     "identity": "01 — 技能与分类",
     "title": "标题",
     "category": "分类",
@@ -202,8 +202,8 @@
     "row": "第 {{row}} 行",
     "check": "检查材料",
     "save": "保存技能包",
-    "passed": "材料本地预检通过，尚未上传或保存。",
-    "notSaved": "R3 开放保存。输入仅在停留此页时保留，不是已保存的草稿。",
+    "passed": "材料本地检查通过，保存时服务端会再次检查文件。",
+    "notSaved": "全部文件上传并通过服务端检查后才共享。未保存的输入仅保留在当前页面。",
     "chooseFile": "选择文件",
     "noFile": "未选择文件",
     "limits": "暂定上限：Excel {{excel}} MiB／{{rows}} 个采样点；文本文件 {{text}} MiB／{{chars}} 字符。"
@@ -239,5 +239,32 @@
     "parseTimeout": "Excel 处理超时，请尝试较小文件。",
     "fileRead": "无法读取文件，请重新选择。",
     "checking": "请等待文件检查完成。"
+  },
+  "packs": {
+    "shared": "已保存的技能包对所有注册团队成员共享。",
+    "loading": "正在读取技能包…",
+    "loadError": "无法读取技能包，请重试。",
+    "empty": "暂无技能包，可以创建第一份资料。",
+    "categoryUnavailable": "分类暂不可用",
+    "more": "加载更多",
+    "notFound": "未找到技能包",
+    "notFoundHint": "此地址没有已保存的技能包。",
+    "detailError": "无法读取此技能包",
+    "creator": "创建者",
+    "created": "创建时间",
+    "originalEeg": "原始单通道 Excel",
+    "originalText": "原始文本文件",
+    "fileLoading": "正在读取原文件…",
+    "fileError": "无法读取此文件，请重试。",
+    "retryFile": "重新读取文件",
+    "preparing": "正在准备材料…",
+    "uploading": "正在上传",
+    "validating": "正在复验文件并保存…",
+    "saveError": "保存失败，输入和所选文件已保留，请重试。",
+    "uploadError": "上传失败，输入和所选文件已保留，请重试。",
+    "saveBusy": "本次保存仍在处理中，输入已保留，请稍后重试。",
+    "categoryBusy": "此分类暂不可用，请选择其他分类后重试。",
+    "cleanupPending": "已保存并共享，暂存文件清理待完成，管理员可重试清理。",
+    "sessionExpired": "本次上传已过期，输入已保留，请再次保存以重新上传。"
   }
 }

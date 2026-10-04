@@ -10,6 +10,8 @@ export const auth = initializeAuth(app, { persistence: browserSessionPersistence
 export const db = getFirestore(app);
 export const functions = getFunctions(app, settings.region);
 export const storage = getStorage(app);
+storage.maxUploadRetryTime = 8000;
+storage.maxOperationRetryTime = 8000;
 if (settings.local) {
   connectAuthEmulator(auth, `http://127.0.0.1:${settings.ports.auth}`, { disableWarnings: true });
   connectFirestoreEmulator(db, '127.0.0.1', settings.ports.firestore);

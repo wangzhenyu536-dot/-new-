@@ -10,7 +10,7 @@ test('required-field errors and valid text plus Excel preview without saving', a
   await page.getByLabel('EEG Excel', { exact: true }).setInputFiles({ name: 'synthetic.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: Buffer.from(await workbook()) });
   await expect(page.getByRole('img', { name: 'EEG preview' })).toBeVisible(); await expect(page.getByText('3 samples', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Check materials', exact: true }).click(); await expect(page.getByRole('status')).toContainText('Materials passed the local check');
-  await expect(page.getByRole('button', { name: 'Save skill pack', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Save skill pack', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: 'Remove Excel', exact: true }).click(); await page.getByRole('button', { name: 'Check materials', exact: true }).click(); await expect(page.getByRole('alert')).toContainText('Add a valid EEG Excel');
 });
 test('Excel errors identify sheet/row/column and replacement restores preview', async ({ page }) => {

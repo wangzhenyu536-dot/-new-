@@ -1,13 +1,14 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{uid} {
-      allow get: if request.auth != null && request.auth.uid == uid;
-      allow list, write: if false;
-    }
-    match /categories/{id} {
-      allow read: if request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['member', 'admin'];
+    function member() { return request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['member', 'admin']; }
+    match /users/{uid} { allow get: if request.auth != null && request.auth.uid == uid; allow list, write: if false; }
+    match /categories/{id} { allow read: if member(); allow write: if false; }
+    match /packs/{id} {
+      allow get: if member() && (!exists(/databases/$(database)/documents/packs/$(id)) || resource.data.status == 'ready');
+      allow list: if member() && resource.data.status == 'ready';
       allow write: if false;
+      match /files/{fileId} { allow read: if member() && get(/databases/$(database)/documents/packs/$(id)).data.status == 'ready' && resource.data.active == true; allow write: if false; }
     }
     match /{document=**} { allow read, write: if false; }
   }

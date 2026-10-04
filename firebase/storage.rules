@@ -1,6 +1,25 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    function member() { return request.auth != null && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['member', 'admin']; }
+    function session(id) { return firestore.get(/databases/(default)/documents/uploadSessions/$(id)).data; }
+    function accepting(uid, id) { return member() && request.auth.uid == uid && session(id).actorId == uid && session(id).status == 'accepting' && session(id).expiresAt > request.time; }
+    match /staging/{uid}/{sessionId}/{filename} {
+      allow get: if accepting(uid, sessionId) && filename in session(sessionId).fileMap;
+      allow create: if resource == null && accepting(uid, sessionId) && filename in session(sessionId).fileMap && request.resource.size == session(sessionId).fileMap[filename].size && request.resource.contentType == session(sessionId).fileMap[filename].mediaType;
+      allow list, update, delete: if false;
+    }
+    match /packs/{packId}/files/{filename} {
+      function fileId() { return filename.split('[.]')[0]; }
+      // Cloud Storage permits two Firestore reads: membership and the trusted pack access map.
+      function readable() {
+        let data = firestore.get(/databases/(default)/documents/packs/$(packId)).data;
+        let file = data.fileAccess[fileId()];
+        return data.status == 'ready' && file.active == true && file.storagePath == 'packs/' + packId + '/files/' + filename && resource.size == file.size && resource.contentType == file.mediaType;
+      }
+      allow get: if member() && readable();
+      allow list, write: if false;
+    }
     match /{path=**} { allow read, write: if false; }
   }
 }

@@ -161,12 +161,12 @@
     "membersTitle": "Team members",
     "membersHint": "Member management and role changes arrive in R8.",
     "connected": "Your account is connected to the team archive.",
-    "workspaceNext": "Saving and team browsing arrive in R3.",
+    "workspaceNext": "More attachments and editing arrive in R4.",
     "workspaceNav": "Workspace navigation"
   },
   "form": {
     "intro": "Bring a skill into focus. Add its notes and a single-channel EEG Excel, then check your materials.",
-    "templateNotice": "PROPOSED TEMPLATE · Awaiting a real device sample. Local checks only; files are not uploaded.",
+    "templateNotice": "PROPOSED TEMPLATE · Awaiting a real device sample. Local demo files are uploaded only when you save.",
     "identity": "01 — SKILL & CATEGORY",
     "title": "Title",
     "category": "Category",
@@ -203,8 +203,8 @@
     "row": "Row {{row}}",
     "check": "Check materials",
     "save": "Save skill pack",
-    "passed": "Materials passed the local check. Nothing has been uploaded or saved.",
-    "notSaved": "Saving arrives in R3. This form is kept only while you stay on this page; it is not a saved draft.",
+    "passed": "Materials passed the local check. The server checks files again when you save.",
+    "notSaved": "Your pack is shared after all files upload and pass the server check. Unsaved inputs are kept only on this page.",
     "chooseFile": "Choose file",
     "noFile": "No file selected",
     "limits": "Provisional limits: Excel {{excel}} MiB / {{rows}} samples; text file {{text}} MiB / {{chars}} characters."
@@ -240,5 +240,32 @@
     "parseTimeout": "Excel processing exceeded the time limit. Try a smaller file.",
     "fileRead": "Could not read the file. Choose it again.",
     "checking": "Wait for the file check to finish."
+  },
+  "packs": {
+    "shared": "Saved packs are shared with all registered team members.",
+    "loading": "Loading skill packs…",
+    "loadError": "Could not load skill packs. Try again.",
+    "empty": "No skill packs yet. Create the first one.",
+    "categoryUnavailable": "Category unavailable",
+    "more": "Load more",
+    "notFound": "Skill pack not found",
+    "notFoundHint": "This address does not contain a saved skill pack.",
+    "detailError": "Could not load this skill pack",
+    "creator": "Created by",
+    "created": "Created at",
+    "originalEeg": "Original single-channel Excel",
+    "originalText": "Original text file",
+    "fileLoading": "Loading the original file…",
+    "fileError": "Could not load this file. Try again.",
+    "retryFile": "Retry file",
+    "preparing": "Preparing materials…",
+    "uploading": "Uploading",
+    "validating": "Checking uploaded files and saving…",
+    "saveError": "Could not save. Your inputs and selected files are kept; try again.",
+    "uploadError": "Could not upload. Your inputs and selected files are kept; try again.",
+    "saveBusy": "This save is still processing. Your inputs are kept; retry shortly.",
+    "categoryBusy": "This category is unavailable. Choose another category and try again.",
+    "cleanupPending": "Saved and shared. Temporary file cleanup is pending; an administrator can retry cleanup.",
+    "sessionExpired": "This upload session expired. Your inputs are kept; save again to restart."
   }
 }

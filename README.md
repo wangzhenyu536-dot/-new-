@@ -4,7 +4,7 @@
 
 ## 当前交付
 
-R0、R1 已验收。R2 分类与 Excel 预检自动验证通过，待用户验收。首页沿用原视觉，默认英文并记忆手动语言选择。已实现 Firebase 邮箱账户、可信成员档案、角色路由，以及共享分类创建、文本／Excel 本地检查和基础波形预览。保存／列表／详情在 R3，成员管理在 R8；当前不是完整 V1。
+R0～R2 已验收。R3 上传保存、团队列表与原资料详情自动验证通过，待用户验收。正文或有效 TXT 任一即可满足文本条件，也可同时提供；Excel 仍必需。全部文件上传并通过服务端复验后才共享，失败可在当前页面重试。多附件和编辑在 R4，成员管理在 R8；当前不是完整 V1。
 
 ## 本地运行
 
@@ -45,9 +45,10 @@ Java 21 JRE 来自 Eclipse Adoptium 官方接口，校验 SHA-256 后解压至 `
 | 身份 | 邮箱 | 密码 |
 | --- | --- | --- |
 | 普通成员 | member@evertrace.test | EvertraceDemo2026! |
+| 普通成员（查看） | viewer@evertrace.test | EvertraceDemo2026! |
 | 管理员 | admin@evertrace.test | EvertraceDemo2026! |
 
-这些账号仅在本地模拟器中有效。需要重新准备演示账户时，在服务已启动后运行 `npm exec -- node scripts/seed-preview.mjs`，它只操作上述合成账户，不重置现有密码。已存在首位管理员时不能用它将另一个账号提升为管理员。
+这些账号仅在本地模拟器中有效。需要重新准备演示账户时，在服务已启动后运行 `npm exec -- node scripts/seed-preview.mjs`，它只操作上述三类合成账户，不重置现有密码。已存在首位管理员时不能用它将另一个账号提升为管理员。
 
 首位管理员由后台选择，先在网页注册该邮箱，再执行：
 
@@ -65,18 +66,20 @@ npm run admin:init -- registered-email
 npm run verify
 ```
 
-统一入口执行类型检查、静态检查、真实模拟器集成／规则测试、浏览器测试和前后端构建。自动测试使用独立项目 `demo-evertrace-test`、独立端口和浏览器，不清理默认预览资料。
+统一入口执行类型检查、静态检查、真实模拟器集成／规则测试、浏览器测试和前后端构建。自动测试使用独立项目 `demo-evertrace-test`、独立端口、浏览器和 OS 临时目录。验证开始前自动保存运行中的预览快照到 `.runtime/preview-backup`，重启选择最新有效导出；也可由 agent 执行 `npm run preview:snapshot`。维护过期暂存可执行 `npm run uploads:cleanup`，只能操作本地默认模拟器。
 
-- `npm run test:rules`／`npm run test:integration`：账户集成与 Firestore／Storage 规则，加共享校验和配置测试，共 42 项。
-- `npm run test:e2e`：账户、分类、材料预检与首页／语言回归，共 26 项，测试网页端口 5174。
+- `npm run test:rules`／`npm run test:integration`：账户集成与 Firestore／Storage 规则，加共享校验和配置测试，共 61 项。
+- `npm run test:e2e`：账户、分类、材料预检、保存／详情与首页／语言回归，共 36 项，测试网页端口 5174。
 - `npm run build`：网页产物 `apps/web/dist`，函数产物 `functions/lib`。
-- `outputs/R1`、`outputs/R2`：先行失败、通过报告和截图；`playwright-report`：浏览器报告。均被忽略。
-- 本轮验收说明及证据见 [R2 进度](docs/R2-进度.md)。打开 `/packs/new`，填标题与正文、选择／新建分类，用页面下载的合成 Excel 检查波形及行列错误；本轮不上传文件，保存在 R3 开放。
+- `outputs/R1`、`outputs/R2`、`outputs/R3`：先行失败、通过报告和截图；`playwright-report`：浏览器报告。均被忽略。
+- 本轮验收说明及证据见 [R3 进度](docs/R3-进度.md)。打开 `/packs/new`，填标题、分类和正文或 TXT，选择合成 Excel 后保存，再在 `/packs` 查看资料；用 viewer 账户可查看同一份内容。
 
 ## 目录与边界
 
 `apps/web` 为新版 React + TypeScript + Vite 页面，`functions` 为可信服务端 callable，`firebase` 为规则与索引，`tests` 为真实自动测试，`scripts` 为本地环境与管理员工具。
 
-`frontend` 与 Python 原型保留参考；旧运行方式见 `docs/旧版README.md`。历史 `data` 未修改、导入或删除。未完成的技能包访问继续拒绝；分类由成员读取、可信 callable 创建，客户端直接写入拒绝。Firestore 用户只能读取自己的档案，不能直接写角色；资料写入将随业务功能由服务端开放。
+`frontend` 与 Python 原型保留参考；旧运行方式见 `docs/旧版README.md`。历史 `data` 未修改、导入或删除。成员只读 ready 技能包和有效附件，未完成资料访问继续拒绝；分类、技能包由可信 callable 创建，客户端直接写入拒绝。Firestore 用户只能读取自己的档案，不能直接写角色；资料写入将随业务功能由服务端开放。
 
 真实 Excel 模板、单位与容量尚需实际样例验证。云项目、计费、正式邮件和生产部署尚未配置。
+
+R3 曾发生本地模拟器临时目录冲突，已修复隔离并恢复数据库及原账号 UID。一个原非演示临时账号需要重新设置本地密码；恢复说明见 R3 进度。这不涉及真实云账户。

@@ -1,0 +1,2 @@
+合成 TXT，仅用于本地验收，不是真实测量资料。
+Synthetic original text file.

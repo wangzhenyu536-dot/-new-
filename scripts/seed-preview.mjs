@@ -11,7 +11,7 @@ process.env.METADATA_SERVER_DETECTION = 'none';
 process.env.FIREBASE_AUTH_EMULATOR_HOST = '127.0.0.1:9099';
 process.env.FIRESTORE_EMULATOR_HOST = '127.0.0.1:8080';
 const trusted = initializeAdmin({ projectId }), service = getAdminAuth(trusted);
-const accounts = [{ email: 'member@evertrace.test', role: 'member' }, { email: 'admin@evertrace.test', role: 'admin' }];
+const accounts = [{ email: 'member@evertrace.test', role: 'member' }, { email: 'admin@evertrace.test', role: 'admin' }, { email: 'viewer@evertrace.test', role: 'member' }];
 const password = 'EvertraceDemo2026!';
 try {
   for (const account of accounts) {
