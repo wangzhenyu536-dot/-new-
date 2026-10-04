@@ -5,9 +5,9 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, getBytes, uploadBytes } from 'firebase/storage';
 let env: RulesTestEnvironment;
 beforeAll(async () => {
-  env = await initializeTestEnvironment({ projectId: 'demo-evertrace',
-    firestore: { host: '127.0.0.1', port: 8080, rules: readFileSync('firebase/firestore.rules', 'utf8') },
-    storage: { host: '127.0.0.1', port: 9199, rules: readFileSync('firebase/storage.rules', 'utf8') } });
+  env = await initializeTestEnvironment({ projectId: 'demo-evertrace-test',
+    firestore: { host: '127.0.0.1', port: 18080, rules: readFileSync('firebase/firestore.rules', 'utf8') },
+    storage: { host: '127.0.0.1', port: 19199, rules: readFileSync('firebase/storage.rules', 'utf8') } });
   await env.withSecurityRulesDisabled(async context => {
     await setDoc(doc(context.firestore(), 'packs/baseline'), { title: 'Synthetic test only', status: 'ready' });
     await uploadBytes(ref(context.storage(), 'packs/baseline/files/test.txt'), new TextEncoder().encode('Synthetic only'));

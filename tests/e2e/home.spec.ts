@@ -25,9 +25,9 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 768, height: 1024
     }
     await page.screenshot({ path: `outputs/R0/current/home-${viewport.width}.png`, fullPage: true, animations: 'disabled' });
     await page.getByRole('link', { name: 'CREATE YOUR FIRST PACK' }).first().click();
-    await expect(page).toHaveURL(/\/packs\/new$/);
-    await expect(page.getByRole('heading', { name: 'Create a skill pack' })).toBeVisible();
-    await expect(page.getByText('Account access arrives in the next iteration.')).toBeVisible();
+    await expect(page).toHaveURL(/\/login\?returnTo=%2Fpacks%2Fnew/);
+    await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Create account', exact: true })).toBeVisible();
     expect(errors).toEqual([]); expect(legacyCalls).toEqual([]);
   });
 }
@@ -35,7 +35,7 @@ test('desktop sign-in, browse links and direct routes are explicit', async ({ pa
   await page.goto('/'); await page.getByRole('link', { name: 'SIGN IN', exact: true }).click();
   await expect(page).toHaveURL(/\/login$/); await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
   await page.goto('/'); await page.getByRole('link', { name: 'BROWSE PACKS', exact: true }).first().click();
-  await expect(page).toHaveURL(/\/packs$/); await expect(page.getByRole('heading', { name: 'Browse skill packs' })).toBeVisible();
+  await expect(page).toHaveURL(/\/login\?returnTo=%2Fpacks$/); await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
   await page.goto('/missing'); await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
 });
 test('mobile menu opens and closes after navigation', async ({ page }) => {
@@ -43,14 +43,14 @@ test('mobile menu opens and closes after navigation', async ({ page }) => {
   await page.getByRole('button', { name: 'Open menu' }).click();
   await expect(page.getByRole('button', { name: 'Close menu' })).toHaveAttribute('aria-expanded', 'true');
   await page.getByRole('link', { name: 'BROWSE PACKS', exact: true }).first().click();
-  await expect(page).toHaveURL(/\/packs$/);
+  await expect(page).toHaveURL(/\/login\?returnTo=%2Fpacks$/);
 });
 test('Chinese / English switch persists across routes and reloads', async ({ page }) => {
   await page.goto('/'); await page.getByRole('button', { name: '中文', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
   await page.getByRole('link', { name: '创建第一个技能包' }).first().click();
-  await expect(page.getByRole('heading', { name: '创建技能包' })).toBeVisible();
-  await page.reload(); await expect(page.getByRole('heading', { name: '创建技能包' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '登录', exact: true })).toBeVisible();
+  await page.reload(); await expect(page.getByRole('heading', { name: '登录', exact: true })).toBeVisible();
   await page.getByRole('link', { name: '返回首页' }).click();
   await page.getByRole('button', { name: 'EN', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');

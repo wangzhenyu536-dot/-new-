@@ -3,9 +3,13 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { Lines } from '../components/Lines';
+import { useAuth } from '../app/AuthProvider';
 
 export function HomePage() {
   const { t } = useTranslation();
+  const { user, profile } = useAuth();
+  const accountLabel = user ? (profile?.displayName?.trim() || profile?.email || user.displayName?.trim() || user.email || t('signIn')) : t('signIn');
+  const accountPath = user ? '/packs' : '/login';
   const [intro, setIntro] = useState(() => !sessionStorage.getItem('evertraceIntroSeen') && !matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [progress, setProgress] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -47,9 +51,9 @@ export function HomePage() {
         <a className="wordmark" href="#archive" onClick={closeMenu}><span className="wordmark-cn">EVERTRACE</span><span className="wordmark-en">®</span></a>
         <nav aria-label={t('navLabel')}>
           <a href="#archive" onClick={closeMenu}>{t('archive')}</a><a href="#process" onClick={closeMenu}>{t('process')}</a><a href="#signals" onClick={closeMenu}>{t('signals')}</a><a href="#privacy" onClick={closeMenu}>{t('privacy')}</a>
-          <Link className="menu-cta" to="/packs" onClick={closeMenu}>{t('browse')}</Link><Link className="menu-cta" to="/login" onClick={closeMenu}>{t('signIn')}</Link><Link className="menu-cta" to="/packs/new" onClick={closeMenu}>{t('startPack')}</Link>
+          <Link className="menu-cta" to="/packs" onClick={closeMenu}>{t('browse')}</Link><Link className="menu-cta account-link" to={accountPath} title={accountLabel} onClick={closeMenu}>{accountLabel}</Link><Link className="menu-cta" to="/packs/new" onClick={closeMenu}>{t('startPack')}</Link>
         </nav>
-        <div className="nav-tools"><div className="nav-actions"><Link className="text-button" to="/login">{t('signIn')}</Link><Link className="button button-small" to="/packs/new">{t('startPack')}<i /></Link></div><LanguageSwitcher /><button className="menu-button" aria-expanded={menuOpen} aria-label={t(menuOpen ? 'closeMenu' : 'openMenu')} onClick={() => setMenuOpen(!menuOpen)}><span /><span /></button></div>
+        <div className="nav-tools"><div className="nav-actions"><Link className="text-button account-link" to={accountPath} title={accountLabel}>{accountLabel}</Link><Link className="button button-small" to="/packs/new">{t('startPack')}<i /></Link></div><LanguageSwitcher /><button className="menu-button" aria-expanded={menuOpen} aria-label={t(menuOpen ? 'closeMenu' : 'openMenu')} onClick={() => setMenuOpen(!menuOpen)}><span /><span /></button></div>
       </header>
       <main id="main">
         <section id="archive" className="archive-hero section-light">
