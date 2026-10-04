@@ -252,7 +252,8 @@
     "imageType": "请选择与文件名一致的真实 JPEG、PNG 或 WebP 图片。",
     "imageSize": "图片超过暂定 8 MiB 上限。",
     "imageInvalid": "图片损坏或超过暂定 1600 万像素处理上限。",
-    "attachmentLimit": "附件数量或总大小超出暂定上限（12 份／30 MiB）。"
+    "attachmentLimit": "附件数量或总大小超出暂定上限（12 份／30 MiB）。",
+    "titleSearchLength": "标题规范化后过长，请缩短标题后重试。"
   },
   "packs": {
     "shared": "已保存的技能包对所有注册团队成员共享。",
@@ -290,6 +291,21 @@
     "versionConflict": "资料已被其他编辑更新，当前未保存的修改仍保留。请重新加载最新版本后再编辑。",
     "reloadLatest": "重新加载最新版本",
     "reloadHint": "重新加载会放弃当前页面尚未保存的修改。",
-    "fileChanged": "已保存的原文件发生变化或缺失。当前修改仍保留，请重新加载资料并检查附件。"
+    "fileChanged": "已保存的原文件发生变化或缺失。当前修改仍保留，请重新加载资料并检查附件。",
+    "titlePrefix": "标题前缀",
+    "search": "搜索",
+    "prefixHint": "匹配标题开头，英文字母大小写和全角字母视为相同。",
+    "filterCategory": "筛选分类",
+    "allCategories": "全部分类",
+    "show": "显示范围",
+    "allPacks": "全部技能包",
+    "myPacks": "我创建的技能包",
+    "clearFilters": "清除筛选",
+    "titleOrder": "按标题排列 · 前缀匹配",
+    "newestFirst": "按创建时间倒序",
+    "noMatches": "没有符合当前筛选条件的技能包。",
+    "loadingMore": "正在加载更多技能包…",
+    "invalidFilters": "筛选条件无效，请清除筛选或缩短标题前缀后重试。",
+    "categoryLoadError": "分类筛选加载失败，资料列表和标题搜索仍可使用。"
   }
 }

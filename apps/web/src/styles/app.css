@@ -46,3 +46,14 @@ a.button{text-decoration:none}
 .pack-image { display: block; max-width: 100%; max-height: 560px; object-fit: contain; margin: 1rem 0; }
 .replace-picker { position: relative; display: inline-block; font: inherit; padding: .5rem 0; text-decoration: underline; cursor: pointer; overflow-wrap: anywhere; }
 .replace-picker input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+
+/* Search and category/ownership filters retain the archive typography. */
+.pack-filters { border-block: 1px solid var(--line); padding: 24px 0; margin: 30px 0 12px; max-width: 860px; }
+.pack-filters label { display: block; font: 12px var(--mono); margin-bottom: 12px; }
+.pack-filters input, .pack-filters select { width: 100%; min-width: 0; border: 1px solid #aaa; border-radius: 0; padding: 13px 12px; background: transparent; color: var(--ink); font: 16px var(--sans); }
+.pack-search > div { display: flex; gap: 14px; align-items: stretch; }
+.pack-search > div input { flex: 1; }
+.pack-filter-controls { display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: end; margin-top: 22px; }
+.pack-filter-controls > div { min-width: 0; }
+.pack-sort-note { font: 11px var(--mono) !important; color: #555; margin: 18px 0; }
+@media (max-width: 600px) { .pack-filter-controls { grid-template-columns: 1fr; gap: 20px; } .pack-search > div { flex-direction: column; } .pack-filters .button { width: 100%; } }

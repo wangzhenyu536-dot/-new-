@@ -1,3 +1,4 @@
+import {normalizeTitleSearch,SEARCH_INDEX_BYTES} from './query.js';
 import readExcel from 'read-excel-file/universal';
 import { Unzip, UnzipInflate, zipSync } from 'fflate';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
@@ -26,6 +27,7 @@ export function validatePackInput(input: { title: string; categoryId: string; te
   const issues: Issue[] = [];
   if (!input.title.trim()) issues.push({ code: 'titleRequired', field: 'title' });
   else if (input.title.length > PREVIEW_LIMITS.titleChars) issues.push({ code: 'titleLength', field: 'title' });
+  if (new TextEncoder().encode(normalizeTitleSearch(input.title.trim())).length > SEARCH_INDEX_BYTES) issues.push({code:'titleSearchLength',field:'title'});
   if (!input.categoryId) issues.push({ code: 'categoryRequired', field: 'category' });
   if (!input.text.trim() && !input.textFileValid) issues.push({ code: 'textRequired', field: 'text' });
   if (input.text.length > PREVIEW_LIMITS.textChars) issues.push({ code: 'textLength', field: 'text' });

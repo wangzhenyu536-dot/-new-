@@ -253,7 +253,8 @@
     "imageType": "Choose a real JPEG, PNG or WebP image matching its filename.",
     "imageSize": "Image exceeds the provisional 8 MiB limit.",
     "imageInvalid": "Image is damaged or exceeds the provisional 16-megapixel processing limit.",
-    "attachmentLimit": "Too many attachments or too much total file data (provisional: 12 files / 30 MiB)."
+    "attachmentLimit": "Too many attachments or too much total file data (provisional: 12 files / 30 MiB).",
+    "titleSearchLength": "The title becomes too long after normalization. Shorten it and try again."
   },
   "packs": {
     "shared": "Saved packs are shared with all registered team members.",
@@ -291,6 +292,21 @@
     "versionConflict": "This skill pack changed since you opened it. Your unsaved changes are kept. Reload the latest version before editing again.",
     "reloadLatest": "Reload latest version",
     "reloadHint": "Reloading discards the unsaved changes on this page.",
-    "fileChanged": "A saved original has changed or is missing. Your changes are kept; reload the pack and check its files."
+    "fileChanged": "A saved original has changed or is missing. Your changes are kept; reload the pack and check its files.",
+    "titlePrefix": "Title prefix",
+    "search": "Search",
+    "prefixHint": "Matches the start of a title. Letter case and fullwidth letters are treated alike.",
+    "filterCategory": "Filter category",
+    "allCategories": "All categories",
+    "show": "Show",
+    "allPacks": "All skill packs",
+    "myPacks": "My skill packs",
+    "clearFilters": "Clear filters",
+    "titleOrder": "Title order · prefix match",
+    "newestFirst": "Newest first",
+    "noMatches": "No skill packs match these filters.",
+    "loadingMore": "Loading more skill packs…",
+    "invalidFilters": "These filters are invalid. Clear them or shorten the title prefix and try again.",
+    "categoryLoadError": "Could not load category filters. Your list and search are still available."
   }
 }

@@ -1,0 +1,4 @@
+import {expect,test} from 'vitest';
+import {normalizeTitleSearch,prefixUpperBound,validatePackInput} from '@evertrace/shared';
+test('normalization preserves original-language matching and Unicode range bounds include emoji',()=>{expect(normalizeTitleSearch('ＦＯＣＵＳ')).toBe('focus');expect(prefixUpperBound('木工')).toBe('木左');expect(prefixUpperBound('Focus😀')).toBe('Focus😁');expect(prefixUpperBound('x\u{10ffff}')).toBe('y');expect(prefixUpperBound('\u{10ffff}')).toBeUndefined();expect(prefixUpperBound('\ud7ff')).toBe('\ue000');});
+test('short compatibility titles cannot exceed Firestore indexed-value capacity after normalization',()=>{const base={categoryId:'category',text:'notes',textFileValid:false,eegValid:true};expect(validatePackInput({...base,title:'ﷺ'.repeat(160)})).toContainEqual(expect.objectContaining({code:'titleSearchLength'}));expect(validatePackInput({...base,title:'脑'.repeat(160)})).toEqual([]);});
