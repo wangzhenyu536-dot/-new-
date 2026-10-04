@@ -8,6 +8,7 @@ from typing import Any
 from config import MAX_QUESTIONS, OPENAI_API_KEY, OPENAI_MODEL
 from prompts import PACKAGE_PROMPT, SYSTEM_PROMPT
 
+
 TURN_SCHEMA = {
     "type":"object", "additionalProperties":False,
     "properties":{
