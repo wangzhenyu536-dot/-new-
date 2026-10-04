@@ -4,7 +4,7 @@
 
 ## 当前交付
 
-R0 已验收。R1 账户与访问控制自动验证通过，待用户验收。首页沿用原视觉，默认英文并记忆手动语言选择。已接入 Firebase 邮箱密码注册、登录、退出、找回和服务端普通成员档案；业务页面需要登录，管理员入口验证角色。录入表单／Excel 预检在 R2，保存／列表／详情在 R3，成员管理在 R8；当前不是完整 V1。
+R0、R1 已验收。R2 分类与 Excel 预检自动验证通过，待用户验收。首页沿用原视觉，默认英文并记忆手动语言选择。已实现 Firebase 邮箱账户、可信成员档案、角色路由，以及共享分类创建、文本／Excel 本地检查和基础波形预览。保存／列表／详情在 R3，成员管理在 R8；当前不是完整 V1。
 
 ## 本地运行
 
@@ -67,16 +67,16 @@ npm run verify
 
 统一入口执行类型检查、静态检查、真实模拟器集成／规则测试、浏览器测试和前后端构建。自动测试使用独立项目 `demo-evertrace-test`、独立端口和浏览器，不清理默认预览资料。
 
-- `npm run test:rules`／`npm run test:integration`：账户集成与 Firestore／Storage 规则，共 12 项。
-- `npm run test:e2e`：账户流程与首页／语言回归，共 20 项，测试网页端口 5174。
+- `npm run test:rules`／`npm run test:integration`：账户集成与 Firestore／Storage 规则，加共享校验和配置测试，共 42 项。
+- `npm run test:e2e`：账户、分类、材料预检与首页／语言回归，共 26 项，测试网页端口 5174。
 - `npm run build`：网页产物 `apps/web/dist`，函数产物 `functions/lib`。
-- `outputs/R1`：先行失败、通过报告和截图；`playwright-report`：浏览器报告。均被忽略。
-- 验收说明及证据见 [R1 进度](docs/R1-进度.md)。
+- `outputs/R1`、`outputs/R2`：先行失败、通过报告和截图；`playwright-report`：浏览器报告。均被忽略。
+- 本轮验收说明及证据见 [R2 进度](docs/R2-进度.md)。打开 `/packs/new`，填标题与正文、选择／新建分类，用页面下载的合成 Excel 检查波形及行列错误；本轮不上传文件，保存在 R3 开放。
 
 ## 目录与边界
 
 `apps/web` 为新版 React + TypeScript + Vite 页面，`functions` 为可信服务端 callable，`firebase` 为规则与索引，`tests` 为真实自动测试，`scripts` 为本地环境与管理员工具。
 
-`frontend` 与 Python 原型保留参考；旧运行方式见 `docs/旧版README.md`。历史 `data` 未修改、导入或删除。未完成的技能包和分类访问继续拒绝。Firestore 用户只能读取自己的档案，不能直接写角色；资料写入将随业务功能由服务端开放。
+`frontend` 与 Python 原型保留参考；旧运行方式见 `docs/旧版README.md`。历史 `data` 未修改、导入或删除。未完成的技能包访问继续拒绝；分类由成员读取、可信 callable 创建，客户端直接写入拒绝。Firestore 用户只能读取自己的档案，不能直接写角色；资料写入将随业务功能由服务端开放。
 
 真实 Excel 模板、单位与容量尚需实际样例验证。云项目、计费、正式邮件和生产部署尚未配置。

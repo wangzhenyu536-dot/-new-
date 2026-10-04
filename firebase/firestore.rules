@@ -5,6 +5,10 @@ service cloud.firestore {
       allow get: if request.auth != null && request.auth.uid == uid;
       allow list, write: if false;
     }
+    match /categories/{id} {
+      allow read: if request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['member', 'admin'];
+      allow write: if false;
+    }
     match /{document=**} { allow read, write: if false; }
   }
 }

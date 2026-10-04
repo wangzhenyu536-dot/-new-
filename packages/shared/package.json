@@ -4,6 +4,17 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "read-excel-file": "9.3.10",
+    "fflate": "0.8.3",
+    "fast-xml-parser": "5.11.2"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
   }
 }

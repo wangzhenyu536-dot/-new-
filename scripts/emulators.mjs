@@ -7,11 +7,11 @@ if (existsSync(path.join(localJava, 'bin/java'))) { env.JAVA_HOME = localJava; e
 const mode = process.argv[2] || 'start';
 const build = spawnSync('npm', ['run', 'build:functions'], { stdio: 'inherit', env });
 if (build.status !== 0) process.exit(build.status ?? 1);
-mkdirSync('outputs/R1', { recursive: true });
+mkdirSync('outputs/R2', { recursive: true });
 const testMode = mode !== 'start';
 const savedData = path.join(root, '.runtime/emulator-data');
 const args = testMode
-  ? ['emulators:exec', '--config', 'firebase.test.json', '--project', 'demo-evertrace-test', '--only', 'auth,firestore,storage,functions', mode === 'e2e' ? 'npx playwright test' : mode === 'header-red' ? 'npx playwright test tests/e2e/accounts.spec.ts --grep="homepage account label" --timeout=10000' : mode === 'red' ? 'npx playwright test tests/e2e/accounts.spec.ts --timeout=5000' : 'npm test']
+  ? ['emulators:exec', '--config', 'firebase.test.json', '--project', 'demo-evertrace-test', '--only', 'auth,firestore,storage,functions', mode === 'e2e' ? 'npx playwright test' : mode === 'r2-red' ? 'npx playwright test tests/e2e/create.spec.ts --timeout=10000' : mode === 'header-red' ? 'npx playwright test tests/e2e/accounts.spec.ts --grep="homepage account label" --timeout=10000' : mode === 'red' ? 'npx playwright test tests/e2e/accounts.spec.ts --timeout=5000' : 'npm test']
   : ['emulators:start', '--project', 'demo-evertrace', '--only', 'auth,firestore,storage,functions', '--export-on-exit', savedData, ...(existsSync(path.join(savedData, 'firebase-export-metadata.json')) ? ['--import', savedData] : [])];
 const child = spawn(path.join(root, 'node_modules/.bin/firebase'), args, { stdio: 'inherit', env });
 child.on('exit', code => { process.exitCode = code ?? 1; });
