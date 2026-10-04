@@ -1,0 +1,28 @@
+/* Extend the existing design; original visual reference remains untouched. */
+a.button{text-decoration:none}
+.nav-tools{justify-self:end;display:flex;align-items:center;gap:14px}
+.language-switcher{display:flex;gap:7px;align-items:center}
+.language-switcher button{border:0;background:transparent;color:inherit;font:11px var(--mono);padding:6px 0;opacity:.65}
+.language-switcher button[aria-pressed=true]{opacity:1;text-decoration:underline;text-underline-offset:4px}
+.nav nav .menu-cta{display:none}
+.signal-upload a{display:inline-flex;justify-content:center;padding:13px;border:1px solid #666;font:600 11px var(--mono);text-decoration:none}
+.signal-upload a:hover{background:white;color:black}
+.format-preview{font:13px var(--mono);min-width:0}
+.format-preview>div{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #444;padding:12px 0}
+.format-preview small{font:10px var(--mono);color:#999;display:block;margin-top:14px}
+.workspace-description{max-width:900px;font-size:clamp(22px,3vw,42px);line-height:1.45}
+.workspace-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.workspace-actions .button-package{margin:0}
+.preview-page{min-height:100vh;background:var(--paper);padding:30px var(--page)}
+.preview-header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:25px}
+.preview-page main{max-width:900px;padding:100px 0}
+.preview-page h1{font:600 clamp(48px,7vw,110px)/1 var(--serif);letter-spacing:-.04em;margin:30px 0}
+.preview-page p{font-size:18px;line-height:1.7;max-width:620px}
+.preview-page .index-label{color:#555}
+.preview-status{margin:45px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 0 25px}
+.preview-status small{font:11px var(--mono);color:#555}
+:lang(zh-CN){--sans:"Inter","PingFang SC","Microsoft YaHei",sans-serif;--serif:"Songti SC","Noto Serif SC",Georgia,serif;--mono:"IBM Plex Mono","PingFang SC",monospace}
+:lang(zh-CN) .hero-title-wrap h1{line-height:1.04;letter-spacing:-.06em}
+:lang(zh-CN) .statement h2,:lang(zh-CN) .process h2,:lang(zh-CN) .materials h2,:lang(zh-CN) .signals h2,:lang(zh-CN) .privacy h2,:lang(zh-CN) .studio h2,:lang(zh-CN) .finale h2{font-family:var(--sans);line-height:1.06;letter-spacing:-.055em}
+@media(max-width:900px){.nav nav .menu-cta{display:block}.nav-tools{gap:18px}.studio-controls{gap:25px;flex-wrap:wrap}.format-preview{font-size:12px}}
+@media(max-width:600px){.nav-tools{gap:12px}.nav-tools .language-switcher{gap:8px}.signal-console-top{font-size:10px;gap:12px}.format-preview>div{gap:15px}.preview-page main{padding:65px 0}.workspace-actions{width:100%}.workspace-actions .button{width:100%}.consent-inline{flex-wrap:wrap;gap:12px}.studio-header{gap:20px}.studio-status{max-width:100px;line-height:1.6}}

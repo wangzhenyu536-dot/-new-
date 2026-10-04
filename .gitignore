@@ -1,0 +1,20 @@
+# Local runtimes and generated artifacts
+.runtime/
+.cache/
+node_modules/
+dist/
+lib/
+coverage/
+playwright-report/
+test-results/
+outputs/
+*-debug.log
+*.log
+.DS_Store
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+# Historic data is preserved; new local captures are not source code.
+data/

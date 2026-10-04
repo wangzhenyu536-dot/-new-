@@ -1,0 +1,26 @@
+import { createHash } from 'node:crypto';
+import { mkdir, writeFile, symlink, access } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import path from 'node:path';
+const java = path.resolve('.runtime/java');
+try { await access(path.join(java, 'bin/java')); console.log('Project Java is already available.'); process.exit(0); } catch { /* Install below. */ }
+const os = { darwin: 'mac', linux: 'linux', win32: 'windows' }[process.platform];
+const arch = { arm64: 'aarch64', x64: 'x64' }[process.arch];
+if (!os || !arch || os === 'windows') throw new Error('Set JAVA_HOME to a Java 21 runtime on this platform.');
+const res = await fetch(`https://api.adoptium.net/v3/assets/latest/21/hotspot?architecture=${arch}&image_type=jre&os=${os}&vendor=eclipse`);
+if (!res.ok) throw new Error(`Java metadata failed: ${res.status}`);
+const assets = await res.json(), asset = assets[0];
+if (!asset) throw new Error('No compatible Java 21 runtime.');
+const pkg = asset.binary.package;
+const download = await fetch(pkg.link); if (!download.ok) throw new Error(`Java download failed: ${download.status}`);
+const bytes = Buffer.from(await download.arrayBuffer());
+if (createHash('sha256').update(bytes).digest('hex') !== pkg.checksum) throw new Error('Java checksum mismatch.');
+const runtime = path.resolve('.runtime'); await mkdir(runtime, { recursive: true });
+const archive = path.join(runtime, pkg.name); await writeFile(archive, bytes);
+const unpack = spawnSync('tar', ['-xzf', archive, '-C', runtime], { stdio: 'inherit' });
+if (unpack.status !== 0) throw new Error('Java extraction failed.');
+const name = asset.release_name + '-jre';
+const home = path.join(runtime, name, ...(os === 'mac' ? ['Contents', 'Home'] : []));
+await access(path.join(home, 'bin/java')); await symlink(home, java);
+await writeFile(path.join(runtime, 'java-source.json'), JSON.stringify({ release: asset.release_name, url: pkg.link, sha256: pkg.checksum }, null, 2));
+console.log('Verified Java 21 is ready inside .runtime/ (ignored by Git).');
