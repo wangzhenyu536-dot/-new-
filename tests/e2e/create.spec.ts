@@ -31,7 +31,7 @@ test('category creation failure keeps input and succeeds after retry', async ({ 
 });
 test('Chinese form fits mobile and synthetic example can be downloaded', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 }); await enter(page); await page.getByRole('button', { name: '中文', exact: true }).click();
-  await expect(page.getByLabel('标题', { exact: true })).toBeVisible(); await expect(page.getByLabel('脑电 Excel', { exact: true })).toBeVisible(); await expect(page.getByText('选择文件', { exact: true })).toHaveCount(2);
+  await expect(page.getByLabel('标题', { exact: true })).toBeVisible(); await expect(page.getByLabel('脑电 Excel', { exact: true })).toBeVisible(); await expect(page.getByText('选择文件', { exact: true })).toHaveCount(3);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('link', { name: '下载合成 Excel 示例', exact: true }).click()]); expect(download.suggestedFilename()).toBe('synthetic-eeg-valid.xlsx');
   await page.screenshot({ path: 'outputs/R2/create-mobile.png', fullPage: true });

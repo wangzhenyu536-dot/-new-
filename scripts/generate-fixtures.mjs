@@ -1,3 +1,4 @@
+import sharp from 'sharp';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { workbook, editSheet, validRows } from '../tests/fixtures/workbooks.mjs';
 const root = 'outputs/R2/samples'; mkdirSync(root, { recursive: true });
@@ -9,3 +10,6 @@ writeFileSync(`${root}/synthetic-eeg-formula.xlsx`, editSheet(valid, xml => xml.
 writeFileSync(`${root}/synthetic-notes.txt`, 'Synthetic practice notes. These are not real EEG measurements.\n');
 writeFileSync(`${root}/README.txt`, 'All files are synthetic test fixtures, not real device measurements.\nThe proposed template has timestamp_ms and value columns, with milliseconds and raw values only.\n');
 console.log('Synthetic R2 samples generated at ' + root);
+
+// Small generated colour patches are fixtures, not photographs or real EEG data.
+for(const format of ['png','jpeg','webp'])writeFileSync(`apps/web/public/samples/synthetic-image.${format}`,await sharp({create:{width:240,height:160,channels:3,background:'#879992'}}).toFormat(format).toBuffer());

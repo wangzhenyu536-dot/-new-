@@ -4,7 +4,7 @@
 
 ## 当前交付
 
-R0～R2 已验收。R3 上传保存、团队列表与原资料详情自动验证通过，待用户验收。正文或有效 TXT 任一即可满足文本条件，也可同时提供；Excel 仍必需。全部文件上传并通过服务端复验后才共享，失败可在当前页面重试。多附件和编辑在 R4，成员管理在 R8；当前不是完整 V1。
+R0～R3 已验收。R4 多 TXT／图片／Excel、创建者及管理员编辑、附件替换移除和版本冲突已实现，自动验证通过，待用户验收。正文或有效 TXT 任一即可满足文本条件，也可同时提供；至少一份 Excel 必需。新附件全部上传并通过服务端复验后才提交，编辑失败保持旧版本，当前表单可重试；没有持久化草稿。下载在 R6，整体删除在 R7，成员管理在 R8；当前不是完整 V1。
 
 ## 本地运行
 
@@ -66,13 +66,13 @@ npm run admin:init -- registered-email
 npm run verify
 ```
 
-统一入口执行类型检查、静态检查、真实模拟器集成／规则测试、浏览器测试和前后端构建。自动测试使用独立项目 `demo-evertrace-test`、独立端口、浏览器和 OS 临时目录。验证开始前自动保存运行中的预览快照到 `.runtime/preview-backup`，重启选择最新有效导出；也可由 agent 执行 `npm run preview:snapshot`。维护过期暂存可执行 `npm run uploads:cleanup`，只能操作本地默认模拟器。
+统一入口执行类型检查、静态检查、真实模拟器集成／规则测试、浏览器测试和前后端构建。自动测试使用独立项目 `demo-evertrace-test`、独立端口、浏览器和 OS 临时目录（默认 `.runtime/p`，测试 `.runtime/t`）。验证开始前自动保存运行中的预览快照到 `.runtime/preview-backup`，重启选择最新有效导出；也可由 agent 执行 `npm run preview:snapshot`。维护过期暂存可执行 `npm run uploads:cleanup`，只能操作本地默认模拟器。
 
-- `npm run test:rules`／`npm run test:integration`：账户集成与 Firestore／Storage 规则，加共享校验和配置测试，共 61 项。
-- `npm run test:e2e`：账户、分类、材料预检、保存／详情与首页／语言回归，共 36 项，测试网页端口 5174。
+- `npm run test:rules`／`npm run test:integration`：账户集成与 Firestore／Storage 规则，加共享校验和配置测试，共 74 项。
+- `npm run test:e2e`：账户、分类、材料预检、保存／详情／多附件／编辑及首页／语言回归，共 45 项，测试网页端口 5174。
 - `npm run build`：网页产物 `apps/web/dist`，函数产物 `functions/lib`。
-- `outputs/R1`、`outputs/R2`、`outputs/R3`：先行失败、通过报告和截图；`playwright-report`：浏览器报告。均被忽略。
-- 本轮验收说明及证据见 [R3 进度](docs/R3-进度.md)。打开 `/packs/new`，填标题、分类和正文或 TXT，选择合成 Excel 后保存，再在 `/packs` 查看资料；用 viewer 账户可查看同一份内容。
+- `outputs/R1`、`outputs/R2`、`outputs/R3`、`outputs/R4`：先行失败、通过报告和截图；`playwright-report`：浏览器报告。均被忽略。
+- 本轮验收说明及证据见 [R4 进度](docs/R4-进度.md)。打开 `/packs/new` 创建多附件资料，详情点击 Edit skill pack 编辑；用 viewer 查看、用 admin 编辑全部资料。创建页提供合成 TXT、图片及 Excel 示例。
 
 ## 目录与边界
 

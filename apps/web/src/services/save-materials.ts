@@ -1,14 +1,14 @@
 import { FirebaseError } from 'firebase/app';
 import { httpsCallable } from 'firebase/functions';
 import { getMetadata, ref, uploadBytesResumable, type UploadTask } from 'firebase/storage';
-import type { BeginUploadInput, UploadSession, SaveResult } from '@evertrace/shared';
+import type { BeginUploadInput, UploadSession, SaveResult, FileKind } from '@evertrace/shared';
 import { functions, storage } from '../app/firebase';
 export type SaveAttempt = { fingerprint: string; requestId: string };
-export async function saveMaterials(input:{title:string;categoryId:string;textContent:string;eeg:File;text?:File},attempt:{current:SaveAttempt|null},progress:(state:{phase:string;file?:string;percent?:number})=>void,signal:AbortSignal) {
-  progress({phase:'preparing'});const selected=[{file:input.eeg,kind:'eeg' as const},...(input.text?[{file:input.text,kind:'text' as const}]:[])];
+export async function saveMaterials(input:{title:string;categoryId:string;textContent:string;attachments:{file:File;kind:FileKind}[];packId?:string;expectedVersion?:number;retainedFileIds?:string[]},attempt:{current:SaveAttempt|null},progress:(state:{phase:string;file?:string;percent?:number})=>void,signal:AbortSignal) {
+  progress({phase:'preparing'});const selected=input.attachments;
   const filePlan:BeginUploadInput['filePlan']=[];
   for(const {file,kind} of selected){const hash=await crypto.subtle.digest('SHA-256',await file.arrayBuffer());signal.throwIfAborted();filePlan.push({kind,name:file.name,size:file.size,sha256:[...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('')});}
-  const manifest={title:input.title.trim(),categoryId:input.categoryId,textContent:input.textContent,filePlan},fingerprint=JSON.stringify(manifest);
+  const manifest={title:input.title.trim(),categoryId:input.categoryId,textContent:input.textContent,filePlan,...(input.packId?{packId:input.packId,expectedVersion:input.expectedVersion,retainedFileIds:input.retainedFileIds}: {})},fingerprint=JSON.stringify(manifest);
   if(attempt.current?.fingerprint!==fingerprint)attempt.current={fingerprint,requestId:crypto.randomUUID()};
   const session=(await httpsCallable<BeginUploadInput,UploadSession>(functions,'beginUpload')({...manifest,requestId:attempt.current.requestId})).data;
   signal.throwIfAborted();

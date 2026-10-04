@@ -2,8 +2,8 @@ import { expect, test } from 'vitest';
 import { emulatorTempDir, latestPreviewExport } from '../../scripts/emulator-environment.mjs';
 test('test and preview Storage emulators never share their OS temporary blob directory', () => {
   const root='/project';
-  expect(emulatorTempDir(root,'start')).toBe('/project/.runtime/emulators/preview-tmp');
-  expect(emulatorTempDir(root,'exec')).toBe('/project/.runtime/emulators/test-tmp');
+  expect(emulatorTempDir(root,'start')).toBe('/project/.runtime/p');
+  expect(emulatorTempDir(root,'exec')).toBe('/project/.runtime/t');
   expect(emulatorTempDir(root,'e2e')).toBe(emulatorTempDir(root,'exec'));
   expect(emulatorTempDir(root,'start')).not.toBe(emulatorTempDir(root,'exec'));
 });
@@ -21,4 +21,10 @@ test('restart uses the newest valid local export, preserving a newer full previe
     writeFileSync(saved,'invalid JSON');
     expect(latestPreviewExport(root)).toBe(path.join(root,'.runtime','preview-backup'));
   } finally { rmSync(root,{recursive:true,force:true}); }
+});
+
+// Darwin limits Unix socket paths to 104 bytes including the terminator.
+test('emulator temp paths leave space for Firebase function sockets on this checkout',()=>{
+  const root='/Users/programmer_mu/SelfProject/BrainWave/-new-';
+  for(const mode of ['start','exec'])expect(Buffer.byteLength(emulatorTempDir(root,mode)+'/fire_emu_1234567890123456.sock')).toBeLessThan(104);
 });

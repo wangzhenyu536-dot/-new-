@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { readFileSync, statSync } from 'node:fs';
-export function emulatorTempDir(root, mode) { return path.join(root, '.runtime', 'emulators', mode === 'start' ? 'preview-tmp' : 'test-tmp'); }
+export function emulatorTempDir(root, mode) { return path.join(root, '.runtime', mode === 'start' ? 'p' : 't'); }
 export function latestPreviewExport(root) {
   const exports=[];
   for(const name of ['emulator-data','preview-backup']){

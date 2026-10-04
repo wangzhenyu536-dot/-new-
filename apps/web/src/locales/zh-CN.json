@@ -206,7 +206,17 @@
     "notSaved": "全部文件上传并通过服务端检查后才共享。未保存的输入仅保留在当前页面。",
     "chooseFile": "选择文件",
     "noFile": "未选择文件",
-    "limits": "暂定上限：Excel {{excel}} MiB／{{rows}} 个采样点；文本文件 {{text}} MiB／{{chars}} 字符。"
+    "limits": "暂定上限：Excel {{excel}} MiB／{{rows}} 个采样点；文本文件 {{text}} MiB／{{chars}} 字符。",
+    "images": "图片",
+    "imageSection": "04 — 图片",
+    "imageHint": "可选 JPEG、PNG、WebP 图片，保留原文件。",
+    "checkingImage": "正在检查图片…",
+    "multipleHint": "可一次选择多个文件。重新选择会替换本区尚未保存的文件。",
+    "removeAttachment": "移除附件 {{name}}",
+    "replaceAttachment": "替换附件 {{name}}",
+    "attachmentLimits": "暂定附件上限：{{count}} 份／合计 {{total}} MiB；图片每份 {{image}} MiB／1600 万像素。",
+    "downloadTextExample": "下载合成 TXT 示例",
+    "downloadImageExample": "下载合成图片示例"
   },
   "validation": {
     "titleRequired": "请填写标题。",
@@ -238,7 +248,11 @@
     "rowLimit": "采样点超出暂定的 50,000 条上限。",
     "parseTimeout": "Excel 处理超时，请尝试较小文件。",
     "fileRead": "无法读取文件，请重新选择。",
-    "checking": "请等待文件检查完成。"
+    "checking": "请等待文件检查完成。",
+    "imageType": "请选择与文件名一致的真实 JPEG、PNG 或 WebP 图片。",
+    "imageSize": "图片超过暂定 8 MiB 上限。",
+    "imageInvalid": "图片损坏或超过暂定 1600 万像素处理上限。",
+    "attachmentLimit": "附件数量或总大小超出暂定上限（12 份／30 MiB）。"
   },
   "packs": {
     "shared": "已保存的技能包对所有注册团队成员共享。",
@@ -264,7 +278,18 @@
     "uploadError": "上传失败，输入和所选文件已保留，请重试。",
     "saveBusy": "本次保存仍在处理中，输入已保留，请稍后重试。",
     "categoryBusy": "此分类暂不可用，请选择其他分类后重试。",
-    "cleanupPending": "已保存并共享，暂存文件清理待完成，管理员可重试清理。",
-    "sessionExpired": "本次上传已过期，输入已保留，请再次保存以重新上传。"
+    "cleanupPending": "资料已保存并共享。文件清理尚未完成，管理员可重试清理。",
+    "sessionExpired": "本次上传已过期，输入已保留，请再次保存以重新上传。",
+    "edit": "编辑技能包",
+    "editIntro": "修改正文和附件，所有变更验证通过后才更新资料；保存前原版本仍可查看。",
+    "editDenied": "你不能编辑这个技能包",
+    "saveChanges": "保存修改",
+    "existingFiles": "当前附件",
+    "backDetail": "返回技能包",
+    "originalImage": "原始图片",
+    "versionConflict": "资料已被其他编辑更新，当前未保存的修改仍保留。请重新加载最新版本后再编辑。",
+    "reloadLatest": "重新加载最新版本",
+    "reloadHint": "重新加载会放弃当前页面尚未保存的修改。",
+    "fileChanged": "已保存的原文件发生变化或缺失。当前修改仍保留，请重新加载资料并检查附件。"
   }
 }
