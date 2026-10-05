@@ -6,11 +6,12 @@ export async function bootstrapAdmin(db, uid) {
   return db.runTransaction(async tx => {
     const [profile, metadata] = await Promise.all([tx.get(user), tx.get(team)]);
     if (!profile.exists) throw new Error('Register and initialize the account before choosing the first administrator.');
-    if (profile.get('role') === 'admin') return { uid, role: 'admin', changed: false };
+    const administrators = await tx.get(db.collection('users').where('role', '==', 'admin'));
+    if (profile.get('role') === 'admin') { tx.set(team, { adminCount: administrators.size, schemaVersion: 1 }, { merge: true }); return { uid, role: 'admin', changed: false }; }
     if (profile.get('role') !== 'member') throw new Error('Invalid member role.');
-    if ((metadata.get('adminCount') ?? 0) !== 0) throw new Error('A first administrator already exists. Use member management for subsequent role changes.');
+    if (administrators.size !== 0 || (metadata.get('adminCount') ?? 0) !== 0) throw new Error('A first administrator already exists. Use member management for subsequent role changes.');
     tx.update(user, { role: 'admin', updatedAt: FieldValue.serverTimestamp() });
-    tx.set(team, { adminCount: 1 }, { merge: true });
+    tx.set(team, { adminCount: 1, schemaVersion: 1 }, { merge: true });
     return { uid, role: 'admin', changed: true };
   });
 }

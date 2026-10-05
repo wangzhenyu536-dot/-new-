@@ -50,14 +50,32 @@ test('first admin bootstrap protects concurrent initialization and profile reini
   const ua = (await createUserWithEmailAndPassword(a.auth, email(), password)).user;
   const ub = (await createUserWithEmailAndPassword(b.auth, email(), password)).user;
   await Promise.all([a.profile({}), b.profile({})]);
-  const results = await Promise.allSettled([bootstrapAdmin(db, ua.uid), bootstrapAdmin(db, ub.uid)]);
-  expect(results.filter(r => r.status === 'fulfilled')).toHaveLength(1);
-  const profiles = await Promise.all([db.doc(`users/${ua.uid}`).get(), db.doc(`users/${ub.uid}`).get()]);
-  const winner = profiles[0].get('role') === 'admin' ? a : b;
-  expect(profiles.filter(p => p.get('role') === 'admin')).toHaveLength(1);
-  await winner.profile({ role: 'member' });
-  expect((await db.doc(`users/${winner.auth.currentUser!.uid}`).get()).get('role')).toBe('admin');
-  await expect(bootstrapAdmin(db, winner.auth.currentUser!.uid)).resolves.toBeDefined();
+  if (process.env.FIRESTORE_EMULATOR_HOST !== '127.0.0.1:18080') throw new Error('Isolated emulator required.');
+  const previousAdmins = await db.collection('users').where('role', '==', 'admin').get();
+  const previousTeam = (await db.doc('system/team').get()).data();
+  const fixture = db.batch();
+  for (const admin of previousAdmins.docs) fixture.update(admin.ref, { role: 'member' });
+  fixture.set(db.doc('system/team'), { adminCount: 0 });
+  await fixture.commit();
+  try {
+    const results = await Promise.allSettled([bootstrapAdmin(db, ua.uid), bootstrapAdmin(db, ub.uid)]);
+    expect(results.filter(r => r.status === 'fulfilled')).toHaveLength(1);
+    const profiles = await Promise.all([db.doc(`users/${ua.uid}`).get(), db.doc(`users/${ub.uid}`).get()]);
+    const winner = profiles[0].get('role') === 'admin' ? a : b;
+    expect(profiles.filter(p => p.get('role') === 'admin')).toHaveLength(1);
+    await winner.profile({ role: 'member' });
+    expect((await db.doc(`users/${winner.auth.currentUser!.uid}`).get()).get('role')).toBe('admin');
+    await expect(bootstrapAdmin(db, winner.auth.currentUser!.uid)).resolves.toBeDefined();
+  } finally {
+    const restore = db.batch();
+    restore.update(db.doc('users/' + ua.uid), { role: 'member' });
+    restore.update(db.doc('users/' + ub.uid), { role: 'member' });
+    for (const admin of previousAdmins.docs) restore.update(admin.ref, { role: 'admin' });
+    if (previousTeam) restore.set(db.doc('system/team'), previousTeam);
+    else restore.delete(db.doc('system/team'));
+    await restore.commit();
+  }
+
 });
 test('password reset generates a real emulator code; new password works and old password fails', async () => {
   const c = client(), address = email(); await createUserWithEmailAndPassword(c.auth, address, password);

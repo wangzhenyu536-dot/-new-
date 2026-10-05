@@ -160,7 +160,7 @@
     "member": "Member",
     "admin": "Administrator",
     "membersTitle": "Team members",
-    "membersHint": "Member management and role changes arrive in R8.",
+    "membersHint": "Manage member roles and keep at least one administrator.",
     "connected": "Your account is connected to the team archive.",
     "workspaceNext": "More attachments and editing arrive in R4.",
     "workspaceNav": "Workspace navigation"
@@ -392,5 +392,31 @@
     "packCount_one": "{{count}} skill pack",
     "moved_one": "{{count}} skill pack moved",
     "permissionDenied": "You no longer have permission to perform this operation. Reload the page to check your access."
+  },
+  "members": {
+    "hint": "Manage team access. Administrators can manage all skill packs, categories and member roles. Members can manage their own skill packs and view team materials.",
+    "loading": "Loading members…",
+    "loadFailed": "Could not load members. Check your connection and try again.",
+    "total_one": "{{count}} member",
+    "total_other": "{{count}} members",
+    "administrators_one": "{{count}} administrator",
+    "administrators_other": "{{count}} administrators",
+    "you": "You",
+    "unnamed": "Unnamed member",
+    "lastAdministrator": "Last administrator",
+    "promote": "Make administrator",
+    "demote": "Remove administrator",
+    "confirmTitle": "Confirm role change",
+    "promoteHint": "This member will become an administrator and can manage all skill packs, categories and member roles.",
+    "demoteHint": "This administrator will become a member. They can still view team materials and manage their own skill packs.",
+    "selfDemoteHint": "You will lose access to member and category administration after this change.",
+    "understand": "I understand the change in access.",
+    "confirm": "Confirm role change",
+    "changed": "Role updated.",
+    "failed": "Could not change the role. Check your connection and retry.",
+    "lastAdminRequired": "At least one administrator must remain. Make another member an administrator first.",
+    "roleChanged": "This member’s role has changed. Cancel and select them again to review their current role.",
+    "memberUnavailable": "This member is unavailable. Reload the list before trying again.",
+    "requestChanged": "This request no longer matches the selected change. Cancel and try again."
   }
 }

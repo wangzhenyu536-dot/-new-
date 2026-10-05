@@ -58,3 +58,5 @@ export const createCategory = onCall({ region }, async request => {
 export { beginUpload, savePack, cancelUpload, cleanupUploads } from './uploads.js';
 
 export { deletePack, deleteCategory, renameCategory, retryCleanup } from './management.js';
+
+export { setMemberRole } from './members.js';

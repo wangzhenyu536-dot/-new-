@@ -160,7 +160,7 @@
     "member": "普通成员",
     "admin": "管理员",
     "membersTitle": "团队成员",
-    "membersHint": "成员管理和角色调整将在 R8 实现。",
+    "membersHint": "管理成员角色，团队须保留至少一名管理员。",
     "connected": "你的账户已连接到团队资料库。",
     "workspaceNext": "R4 将提供多附件与编辑。",
     "workspaceNav": "工作区导航"
@@ -389,5 +389,29 @@
     "deletePending": "此分类中的技能包仍在删除，请先完成清理。",
     "categoryCountMismatch": "分类数量需要核对，删除已停止并保留剩余引用。",
     "permissionDenied": "你已无权执行此操作，请重新加载页面确认当前权限。"
+  },
+  "members": {
+    "hint": "管理团队权限。管理员可以管理全部技能包、分类和成员角色；普通成员可以管理自己的技能包，并查看团队资料。",
+    "loading": "正在加载成员…",
+    "loadFailed": "无法加载成员，请检查网络后重试。",
+    "total": "{{count}} 位成员",
+    "administrators": "{{count}} 位管理员",
+    "you": "你",
+    "unnamed": "未命名成员",
+    "lastAdministrator": "最后一名管理员",
+    "promote": "设为管理员",
+    "demote": "取消管理员",
+    "confirmTitle": "确认角色变更",
+    "promoteHint": "该成员将成为管理员，可以管理全部技能包、分类和成员角色。",
+    "demoteHint": "该管理员将变为普通成员，仍可查看团队资料并管理自己的技能包。",
+    "selfDemoteHint": "变更后，你将无法进入成员管理和分类管理。",
+    "understand": "我已了解权限将发生变化。",
+    "confirm": "确认角色变更",
+    "changed": "角色已更新。",
+    "failed": "无法修改角色，请检查网络后重试。",
+    "lastAdminRequired": "团队必须保留至少一名管理员，请先将其他成员设为管理员。",
+    "roleChanged": "该成员的角色已改变，请取消并重新选择，确认当前角色后再操作。",
+    "memberUnavailable": "该成员当前不可操作，请重新加载列表。",
+    "requestChanged": "请求与所选变更不一致，请取消后重新操作。"
   }
 }

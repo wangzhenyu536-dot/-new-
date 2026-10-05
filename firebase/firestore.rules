@@ -4,7 +4,7 @@ service cloud.firestore {
     function member() { return request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['member', 'admin']; }
     function admin() { return member() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'; }
     match /adminOperations/{id} { allow read: if admin() || (member() && resource.data.kind == 'deletePack' && resource.data.ownerId == request.auth.uid); allow write: if false; }
-    match /users/{uid} { allow get: if request.auth != null && request.auth.uid == uid; allow list, write: if false; }
+    match /users/{uid} { allow get: if (request.auth != null && request.auth.uid == uid) || admin(); allow list: if admin(); allow write: if false; }
     match /categories/{id} { allow read: if member(); allow write: if false; }
     match /packs/{id} {
       allow get: if member() && (!exists(/databases/$(database)/documents/packs/$(id)) || resource.data.status == 'ready');
