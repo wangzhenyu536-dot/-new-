@@ -9,7 +9,7 @@ test('required-field errors and valid text plus Excel preview without saving', a
   await page.getByLabel('Title', { exact: true }).fill('Synthetic skill'); await category(page); await page.getByLabel('Notes', { exact: true }).fill('Synthetic practice notes');
   await page.getByLabel('EEG Excel', { exact: true }).setInputFiles({ name: 'synthetic.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: Buffer.from(await workbook()) });
   await expect(page.getByRole('img', { name: 'EEG preview' })).toBeVisible(); await expect(page.getByText('3 samples', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Check materials', exact: true }).click(); await expect(page.getByRole('status')).toContainText('Materials passed the local check');
+  await page.getByRole('button', { name: 'Check materials', exact: true }).click(); await expect(page.getByRole('status').filter({hasText:'Materials passed the local check'})).toContainText('Materials passed the local check');
   await expect(page.getByRole('button', { name: 'Save skill pack', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: 'Remove Excel', exact: true }).click(); await page.getByRole('button', { name: 'Check materials', exact: true }).click(); await expect(page.getByRole('alert')).toContainText('Add a valid EEG Excel');
 });
@@ -23,7 +23,7 @@ test('UTF-8 text file can satisfy text requirement and empty replacement invalid
   await enter(page); await page.getByLabel('Title', { exact: true }).fill('Text attachment'); await category(page);
   await page.getByLabel('Text file', { exact: true }).setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('Synthetic UTF-8 notes') });
   await page.getByLabel('EEG Excel', { exact: true }).setInputFiles({ name: 'valid.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: Buffer.from(await workbook()) });
-  await expect(page.getByRole('img', { name: 'EEG preview' })).toBeVisible(); await page.getByRole('button', { name: 'Check materials', exact: true }).click(); await expect(page.getByRole('status')).toContainText('Materials passed the local check');
+  await expect(page.getByRole('img', { name: 'EEG preview' })).toBeVisible(); await page.getByRole('button', { name: 'Check materials', exact: true }).click(); await expect(page.getByRole('status').filter({hasText:'Materials passed the local check'})).toContainText('Materials passed the local check');
   await page.getByLabel('Text file', { exact: true }).setInputFiles({ name: 'empty.txt', mimeType: 'text/plain', buffer: Buffer.from('  ') }); await expect(page.getByRole('alert')).toContainText('Text file is empty');
 });
 test('category creation failure keeps input and succeeds after retry', async ({ page }) => {

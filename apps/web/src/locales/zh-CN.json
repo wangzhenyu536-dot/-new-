@@ -198,7 +198,7 @@
     "preview": "脑电预览",
     "samples": "{{count}} 个采样点",
     "rawValues": "原始值",
-    "previewNote": "基础完整时间范围预览。大序列使用最小／最大值包络显示，原始采样保持不变。幅值单位尚待真实样例确认。",
+    "previewNote": "单通道原始波形。原始采样和文件保持不变，幅值单位尚待真实设备样例确认。",
     "row": "第 {{row}} 行",
     "check": "检查材料",
     "save": "保存技能包",
@@ -307,5 +307,39 @@
     "loadingMore": "正在加载更多技能包…",
     "invalidFilters": "筛选条件无效，请清除筛选或缩短标题前缀后重试。",
     "categoryLoadError": "分类筛选加载失败，资料列表和标题搜索仍可使用。"
+  },
+  "wave": {
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "panLeft": "向左平移",
+    "panRight": "向右平移",
+    "reset": "恢复全图",
+    "start": "起始时间（ms）",
+    "end": "结束时间（ms）",
+    "range": "可见时间范围",
+    "sample": "脑电采样读数",
+    "readHint": "指向波形，读取原始采样点。",
+    "gestures": "滚轮或双指缩放，拖动平移。也可通过按钮和时间输入框操作。",
+    "sampling": "采用保留极值的显示抽样，精确读数来自原始采样点。"
+  },
+  "download": {
+    "zip": "下载 ZIP",
+    "original": "下载原件",
+    "png": "下载 PNG",
+    "preparing": "正在准备导出…",
+    "reading": "正在读取原件：{{name}}（{{done}} / {{total}}）",
+    "waveforms": "正在生成完整范围波形：{{name}}",
+    "packing": "正在打包资料…",
+    "cancel": "取消导出",
+    "complete": "下载已准备完成。",
+    "retry": "重试导出",
+    "reload": "重新加载技能包",
+    "fullRange": "PNG 始终覆盖完整时间范围。ZIP 包含当前全部原件及每份 Excel 对应的波形图。",
+    "exportFailed": "无法导出。请检查网络和文件后重试，未下载残缺压缩包。",
+    "exportChanged": "导出期间技能包已变化，请重新加载后重试。",
+    "exportIntegrity": "原文件大小或校验值不一致，请重新加载并检查附件。",
+    "exportInvalid": "部分资料无法导出，请重新加载并检查附件。",
+    "exportBudget": "导出超过处理预算（64 MiB），请分别下载原件。",
+    "exportCancelled": "已取消导出。"
   }
 }

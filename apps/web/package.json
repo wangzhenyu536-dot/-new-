@@ -9,18 +9,19 @@
     "dev:test": "vite --host 127.0.0.1 --port 5174 --strictPort"
   },
   "dependencies": {
+    "@evertrace/shared": "0.1.0",
+    "fflate": "0.8.3",
+    "firebase": "12.19.0",
+    "i18next": "26.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "react-router-dom": "7.18.4",
-    "i18next": "26.4.2",
     "react-i18next": "17.0.15",
-    "@evertrace/shared": "0.1.0",
-    "firebase": "12.19.0"
+    "react-router-dom": "7.18.4"
   },
   "devDependencies": {
-    "vite": "8.3.2",
-    "@vitejs/plugin-react": "6.1.1",
     "@types/react": "19.3.0",
-    "@types/react-dom": "19.3.0"
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "vite": "8.3.2"
   }
 }

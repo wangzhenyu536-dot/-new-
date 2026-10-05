@@ -199,7 +199,7 @@
     "samples_one": "{{count}} sample",
     "samples_other": "{{count}} samples",
     "rawValues": "Raw values",
-    "previewNote": "Basic full-range preview. Large series use a min/max display envelope; original samples remain unchanged. Units await a real sample.",
+    "previewNote": "Single-channel raw waveform. Original samples and files stay unchanged. Physical units await a real device sample.",
     "row": "Row {{row}}",
     "check": "Check materials",
     "save": "Save skill pack",
@@ -308,5 +308,39 @@
     "loadingMore": "Loading more skill packs…",
     "invalidFilters": "These filters are invalid. Clear them or shorten the title prefix and try again.",
     "categoryLoadError": "Could not load category filters. Your list and search are still available."
+  },
+  "wave": {
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "panLeft": "Pan left",
+    "panRight": "Pan right",
+    "reset": "Reset full range",
+    "start": "Window start (ms)",
+    "end": "Window end (ms)",
+    "range": "Visible time range",
+    "sample": "EEG sample",
+    "readHint": "Point to the plot to read an original sample.",
+    "gestures": "Scroll or pinch to zoom; drag to pan. Buttons and time fields work with a keyboard.",
+    "sampling": "Peak-preserving display sampling; exact readings use original samples."
+  },
+  "download": {
+    "zip": "Download ZIP",
+    "original": "Download original",
+    "png": "Download PNG",
+    "preparing": "Preparing export…",
+    "reading": "Reading original: {{name}} ({{done}} / {{total}})",
+    "waveforms": "Rendering full-range waveform: {{name}}",
+    "packing": "Packing the archive…",
+    "cancel": "Cancel export",
+    "complete": "Download prepared.",
+    "retry": "Retry export",
+    "reload": "Reload skill pack",
+    "fullRange": "PNG exports always cover the full time range. ZIP includes all current originals and a waveform for each Excel.",
+    "exportFailed": "Could not export. Check the connection and files, then try again. No incomplete archive was downloaded.",
+    "exportChanged": "This skill pack changed during export. Reload it and try again.",
+    "exportIntegrity": "An original file failed its size or checksum check. Reload the pack and check its files.",
+    "exportInvalid": "Some materials cannot be exported. Reload the pack and check its files.",
+    "exportBudget": "The export exceeds its processing budget (64 MiB). Download originals separately.",
+    "exportCancelled": "Export cancelled."
   }
 }
