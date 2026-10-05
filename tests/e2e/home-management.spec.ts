@@ -1,0 +1,34 @@
+import { expect, test } from '@playwright/test';
+test.use({ reducedMotion: 'reduce' });
+test('homepage management button is visible immediately and returns after registration', async ({ page }) => {
+  await page.goto('/');
+  const entry = page.getByRole('link', { name: 'MANAGE PACKS', exact: true });
+  await expect(entry).toBeInViewport();
+  await expect(entry).toHaveAttribute('href', '/packs');
+  await entry.click();
+  await expect(page).toHaveURL(/\/login\?returnTo=%2Fpacks$/);
+  await page.getByRole('link', { name: 'Create account', exact: true }).click();
+  await page.getByLabel('Name', { exact: true }).fill('Homepage member');
+  await page.getByLabel('Email', { exact: true }).fill(`home-${Date.now()}@example.test`);
+  await page.getByLabel('Password', { exact: true }).fill('Evertrace-test-2026!');
+  await page.getByLabel('Confirm password', { exact: true }).fill('Evertrace-test-2026!');
+  await page.getByRole('button', { name: 'Create account', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Browse skill packs', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Back to homepage' }).click();
+  await page.getByRole('link', { name: 'MANAGE PACKS', exact: true }).click();
+  await expect(page).toHaveURL(/\/packs$/);
+  await expect(page.getByRole('heading', { name: 'Browse skill packs', exact: true })).toBeVisible();
+});
+test('mobile management button is visible without opening the menu and follows language', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.getByRole('link', { name: 'MANAGE PACKS', exact: true })).toBeInViewport();
+  await page.getByRole('button', { name: '中文', exact: true }).click();
+  const entry = page.getByRole('link', { name: '管理技能包', exact: true });
+  await expect(entry).toBeInViewport();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: 'outputs/R6/home-management-mobile.png', animations: 'disabled' });
+  await entry.click();
+  await expect(page).toHaveURL(/\/login\?returnTo=%2Fpacks$/);
+  await expect(page.getByRole('heading', { name: '登录', exact: true })).toBeVisible();
+});

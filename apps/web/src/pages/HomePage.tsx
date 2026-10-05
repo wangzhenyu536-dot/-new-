@@ -57,7 +57,7 @@ export function HomePage() {
       </header>
       <main id="main">
         <section id="archive" className="archive-hero section-light">
-          <div className="micro-row"><span>{t('heroIndex')}</span><span>{t('explore')}</span><span>{t('shared')}</span></div>
+          <div className="micro-row"><span>{t('heroIndex')}</span><span>{t('explore')}</span><Link className="button button-dark home-management-entry" to="/packs">{t('managePacks')} <span aria-hidden="true">↗</span></Link></div>
           <div id="portraitStage" className="portrait-stage" aria-label={t('portraitLabel')} onPointerMove={movePortrait} onPointerLeave={event => { event.currentTarget.style.setProperty('--mx', '0px'); event.currentTarget.style.setProperty('--my', '0px'); }}>
             <img src="/assets/wisdom-portraits.png" alt={t('portraitAlt')} fetchPriority="high" />
             <div className="portrait-more" aria-hidden="true">{t('seeMore')} <span>↗</span></div>

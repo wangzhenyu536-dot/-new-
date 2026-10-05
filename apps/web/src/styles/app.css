@@ -70,3 +70,6 @@ a.button{text-decoration:none}
 .pack-downloads { border-block: 1px solid var(--line); padding: 24px 0; margin: 30px 0; }
 .pack-downloads p, .pack-downloads [role=alert] { overflow-wrap: anywhere; }
 @media(max-width:600px){.wave-controls .button{flex:1 1 auto}.wave-bounds{grid-template-columns:1fr}.file-downloads .button{flex:1}.pack-downloads>.button{width:100%}}
+
+.archive-hero .micro-row{align-items:center;gap:16px}.home-management-entry{flex-shrink:0;min-height:44px;padding:12px 18px;gap:16px;white-space:nowrap}
+@media(max-width:600px){.home-management-entry{padding:12px;gap:10px}}
