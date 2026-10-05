@@ -75,9 +75,9 @@ test('trusted first admin initialization updates the live role and allows the ad
     const account = await getAuth(app).getUserByEmail(email);
     await bootstrapAdmin(getFirestore(app), account.uid);
     await expect(page.getByText('Administrator', { exact: true })).toBeVisible();
-    await page.getByRole('link', { name: 'Team members', exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'Team members', exact: true })).toBeVisible();
-    await page.reload(); await expect(page.getByRole('heading', { name: 'Team members', exact: true })).toBeVisible();
+    await page.getByRole('link', { name: 'Community members', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Community members', exact: true })).toBeVisible();
+    await page.reload(); await expect(page.getByRole('heading', { name: 'Community members', exact: true })).toBeVisible();
   } finally { await deleteApp(app); }
 });
 

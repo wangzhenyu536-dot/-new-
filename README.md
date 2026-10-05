@@ -1,10 +1,10 @@
 # EVERTRACE／拾光 V1
 
-团队技能包管理系统：文本、图片、单通道脑电 Excel，分类、波形和下载。需求见 [开发文档](docs/V1-开发文档.md)，迭代见 [开发计划](docs/迭代开发计划.md)，开发约定见 [agent.md](agent.md)。
+社区技能包管理系统：文本、图片、单通道脑电 Excel，分类、波形和下载。需求见 [开发文档](docs/V1-开发文档.md)，迭代见 [开发计划](docs/迭代开发计划.md)，开发约定见 [agent.md](agent.md)。
 
 ## 当前交付
 
-R0～R7 已验收（含主页入口和创建者删除修订）。R8 管理员成员列表、设置／取消管理员、即时权限变化及最后管理员保护已实现，200 项自动测试及类型／静态／构建通过，待用户验收。管理员从资料列表 Team members／团队成员进入成员管理。技能包创建编辑、查询、波形和下载、归属删除、分类迁移及清理重试均可用。正文或有效 TXT 任一即可，至少一份 Excel 必需；没有持久化草稿。真实模板、容量、上线文案及授权云联调在 R9，当前不是完整 V1。
+R0～R7 已验收（含主页入口和创建者删除修订）。R8 管理员成员列表、设置／取消管理员、即时权限变化及最后管理员保护已实现，200 项自动测试及类型／静态／构建通过，待用户验收。管理员从资料列表 Community members／社区成员进入成员管理。技能包创建编辑、查询、波形和下载、归属删除、分类迁移及清理重试均可用。正文或有效 TXT 任一即可，至少一份 Excel 必需；没有持久化草稿。真实模板、容量、上线文案及授权云联调在 R9，当前不是完整 V1。
 
 ## 本地运行
 
@@ -72,7 +72,7 @@ npm run verify
 - `npm run test:e2e`：账户、分类、材料预检、保存／详情／多附件／编辑、搜索／筛选／分页／断网重试、首页／语言及原件／PNG／ZIP、触控、取消、版本绑定和大文件响应，加删除、分类管理、重试及主页入口，加两账户角色变化和最后管理员保护，共 72 项，测试网页端口 5174。
 - `npm run build`：网页产物 `apps/web/dist`，函数产物 `functions/lib`。
 - `outputs/R1`、`outputs/R2`、`outputs/R3`、`outputs/R4`、`outputs/R5`、`outputs/R6`、`outputs/R7`、`outputs/R8`：先行失败、通过报告和截图；`playwright-report`：浏览器报告。均被忽略。
-- 本轮说明见 [R8 进度](docs/R8-进度.md)。管理员 admin@evertrace.test／EvertraceDemo2026!；从 `/packs` 的 Team members 进入 `/admin/members`，对专用 R8 demo member（r8-member@evertrace.test，同密码）验收设置／取消管理员。技能包和分类已有样例仍见 [R7 进度](docs/R7-进度.md)。
+- 本轮说明见 [R8 进度](docs/R8-进度.md)。管理员 admin@evertrace.test／EvertraceDemo2026!；从 `/packs` 的 Community members 进入 `/admin/members`，对专用 R8 demo member（r8-member@evertrace.test，同密码）验收设置／取消管理员。技能包和分类已有样例仍见 [R7 进度](docs/R7-进度.md)。
 
 ## 目录与边界
 
