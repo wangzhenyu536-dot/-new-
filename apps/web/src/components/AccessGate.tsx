@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, type ReactNode } from 'react';
 import { useAuth } from '../app/AuthProvider';
 import { AccountLayout } from './AccountLayout';
-export function safeReturnTo(value: string | null) { return value && value.length<=4096 && (/^\/packs\?[^#]*$/.test(value) || ['/packs', '/packs/new', '/admin/members'].includes(value) || /^\/packs\/[A-Za-z0-9_-]{1,100}(?:\/edit)?$/.test(value)) ? value : '/packs'; }
+export function safeReturnTo(value: string | null) { return value && value.length<=4096 && (/^\/packs\?[^#]*$/.test(value) || ['/packs', '/packs/new', '/admin/members', '/admin/categories'].includes(value) || /^\/packs\/[A-Za-z0-9_-]{1,100}(?:\/edit)?$/.test(value)) ? value : '/packs'; }
 export function AccountPending() {
   const { t } = useTranslation(), access = useAuth(); const [error, setError] = useState(false);
   return <AccountLayout>{access.status === 'loading' ? <p role="status">{t('account.loading')}</p> : <><h1>{t('account.unavailable')}</h1><p role="alert">{t('account.profileError')}</p><div className="account-actions"><button className="button button-dark" onClick={access.retry}>{t('account.retry')}</button><button className="button" onClick={() => { void access.logout().catch(() => setError(true)); }}>{t('account.signOut')}</button></div>{error && <p role="alert">{t('account.network')}</p>}</>}</AccountLayout>;

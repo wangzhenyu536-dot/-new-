@@ -4,7 +4,7 @@
 
 ## 当前交付
 
-R0～R5 已验收。R6 波形缩放、拖动、原始读数、恢复全图及单原件／完整范围 PNG／整包 ZIP 下载已实现，自动验证通过，待用户验收。ZIP 保留全部当前原件，重名不覆盖；缺文件、校验失败或版本变化会停止，取消和失败可重试。多附件创建、编辑、搜索与组合筛选均可使用；正文或有效 TXT 任一即可，至少一份 Excel 必需；没有持久化草稿。整体删除和分类管理在 R7，成员角色在 R8；当前不是完整 V1。
+R0～R6 已验收（含主页管理入口）。R7 创建者删除自己的／管理员删除全部技能包，确认删除、失败清理重试、分类重命名和迁移后删除已实现，自动验证通过，待用户验收。管理员从资料列表进入分类管理；创建者或管理员从详情删除技能包；清理／迁移未完成时保留可重试进度。波形交互、原件／完整 PNG／ZIP、多附件创建编辑、搜索与组合筛选均可用。正文或有效 TXT 任一即可，至少一份 Excel 必需；没有持久化草稿。成员角色管理在 R8，当前不是完整 V1。
 
 ## 本地运行
 
@@ -68,11 +68,11 @@ npm run verify
 
 统一入口执行类型检查、静态检查、真实模拟器集成／规则测试、浏览器测试和前后端构建。自动测试使用独立项目 `demo-evertrace-test`、独立端口、浏览器和 OS 临时目录（默认 `.runtime/p`，测试 `.runtime/t`）。验证开始前自动保存运行中的预览快照到 `.runtime/preview-backup`，重启选择最新有效导出；也可由 agent 执行 `npm run preview:snapshot`。维护过期暂存可执行 `npm run uploads:cleanup`，只能操作本地默认模拟器。
 
-- `npm run test:rules`／`npm run test:integration`：账户集成与 Firestore／Storage 规则，加共享校验和配置测试，查询／索引／规范化、波形／导出与合成容量测试，共 95 项。
-- `npm run test:e2e`：账户、分类、材料预检、保存／详情／多附件／编辑、搜索／筛选／分页／断网重试、首页／语言及原件／PNG／ZIP、触控、取消、版本绑定和大文件响应，共 60 项，测试网页端口 5174。
+- `npm run test:rules`／`npm run test:integration`：账户集成与 Firestore／Storage 规则，加共享校验和配置测试，查询／索引／规范化、波形／导出与合成容量测试，加归属删除、管理员迁移与清理测试，共 116 项。
+- `npm run test:e2e`：账户、分类、材料预检、保存／详情／多附件／编辑、搜索／筛选／分页／断网重试、首页／语言及原件／PNG／ZIP、触控、取消、版本绑定和大文件响应，加删除、分类管理、重试及主页入口，共 68 项，测试网页端口 5174。
 - `npm run build`：网页产物 `apps/web/dist`，函数产物 `functions/lib`。
-- `outputs/R1`、`outputs/R2`、`outputs/R3`、`outputs/R4`、`outputs/R5`、`outputs/R6`：先行失败、通过报告和截图；`playwright-report`：浏览器报告。均被忽略。
-- 本轮验收说明及证据见 [R6 进度](docs/R6-进度.md)。打开 `http://127.0.0.1:5173/packs/dc3c2d42522e961decea8386a9f72caf65956bc64e6f022f4697e4f129ad264a`，试缩放／平移／读数，缩放后下载完整 PNG，再下载原件和 ZIP。已准备 10,000 点／301 点合成波形及同名 TXT。
+- `outputs/R1`、`outputs/R2`、`outputs/R3`、`outputs/R4`、`outputs/R5`、`outputs/R6`、`outputs/R7`：先行失败、通过报告和截图；`playwright-report`：浏览器报告。均被忽略。
+- 本轮验收说明及证据见 [R7 进度](docs/R7-进度.md)。演示管理员 admin@evertrace.test／EvertraceDemo2026!；普通成员 member@evertrace.test／EvertraceDemo2026! 可删除自己的包（以下删除样例由该成员创建）；从 `/packs` 进入 `/admin/categories`，或打开 `http://127.0.0.1:5173/packs/31966b89fd6545070f3256bdf2bb979ff24ff398c9ef34b4ebc21dc3337fb591` 的合成删除样例。已有源／目标／空分类和迁移样例。
 
 ## 目录与边界
 

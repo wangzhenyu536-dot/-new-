@@ -7,6 +7,7 @@ import { AccountPage } from '../pages/AccountPage';
 import { CreatePackPage } from '../pages/CreatePackPage';
 import { PacksPage } from '../pages/PacksPage';
 import { PackDetailPage } from '../pages/PackDetailPage';
+import { CategoriesPage } from '../pages/CategoriesPage';
 import { WorkspacePage } from '../pages/WorkspacePage';
 import { AuthProvider } from './AuthProvider';
 import { AccessGate } from '../components/AccessGate';
@@ -14,5 +15,5 @@ export function App() {
   const { i18n } = useTranslation(); const location = useLocation();
   useEffect(() => { document.documentElement.lang = i18n.resolvedLanguage ?? 'en'; }, [i18n.resolvedLanguage]);
   useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
-  return <AuthProvider><Routes><Route path="/" element={<HomePage />} /><Route path="/packs/new" element={<AccessGate><CreatePackPage /></AccessGate>} /><Route path="/packs" element={<AccessGate><PacksPage /></AccessGate>} /><Route path="/packs/:id/edit" element={<AccessGate><CreatePackPage edit /></AccessGate>} /><Route path="/packs/:id" element={<AccessGate><PackDetailPage /></AccessGate>} /><Route path="/admin/members" element={<AccessGate admin><WorkspacePage kind="admin" /></AccessGate>} /><Route path="/login" element={<AccountPage mode="login" />} /><Route path="/register" element={<AccountPage mode="register" />} /><Route path="/forgot-password" element={<AccountPage mode="reset" />} /><Route path="*" element={<PreviewPage title="notFound" hint="notFoundHint" />} /></Routes></AuthProvider>;
+  return <AuthProvider><Routes><Route path="/" element={<HomePage />} /><Route path="/packs/new" element={<AccessGate><CreatePackPage /></AccessGate>} /><Route path="/packs" element={<AccessGate><PacksPage /></AccessGate>} /><Route path="/packs/:id/edit" element={<AccessGate><CreatePackPage edit /></AccessGate>} /><Route path="/packs/:id" element={<AccessGate><PackDetailPage /></AccessGate>} /><Route path="/admin/categories" element={<AccessGate admin><CategoriesPage /></AccessGate>} /><Route path="/admin/members" element={<AccessGate admin><WorkspacePage kind="admin" /></AccessGate>} /><Route path="/login" element={<AccountPage mode="login" />} /><Route path="/register" element={<AccountPage mode="register" />} /><Route path="/forgot-password" element={<AccountPage mode="reset" />} /><Route path="*" element={<PreviewPage title="notFound" hint="notFoundHint" />} /></Routes></AuthProvider>;
 }
