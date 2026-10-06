@@ -255,7 +255,10 @@
     "imageSize": "Image exceeds the provisional 8 MiB limit.",
     "imageInvalid": "Image is damaged or exceeds the provisional 16-megapixel processing limit.",
     "attachmentLimit": "Too many attachments or too much total file data (provisional: 12 files / 30 MiB).",
-    "titleSearchLength": "The title becomes too long after normalization. Shorten it and try again."
+    "titleSearchLength": "The title becomes too long after normalization. Shorten it and try again.",
+    "sparkFileSize": "Each original file must be 512 KiB or smaller.",
+    "sparkAttachmentLimit": "Use at most 12 attachments, totaling no more than 3 MiB.",
+    "fileName": "Use a filename of 1–160 characters without slashes or control characters."
   },
   "packs": {
     "shared": "Saved packs are shared with all registered community members.",
@@ -421,14 +424,25 @@
   },
   "spark": {
     "workspaceTitle": "Community workspace",
-    "workspaceHint": "Welcome to your community. Create shared categories and manage your account here.",
+    "workspaceHint": "Create a skill pack, explore community materials and download their original files. Categories are shared by the community.",
     "categoriesTitle": "Community categories",
     "categoriesHint": "Every member can create a category. Categories are shared across the community; repeated names reuse the existing category.",
-    "available": "Account access and category creation are ready.",
-    "next": "Saving and browsing skill packs will be available in the next update.",
-    "upcomingTitle": "Skill packs are coming next",
-    "upcomingHint": "Your account is ready. Create a community category while we complete saving and browsing.",
+    "available": "Accounts, shared categories, saving and viewing original materials are ready.",
+    "next": "Editing, filters, complete exports and management will be added in the next updates.",
+    "upcomingTitle": "This workspace feature is coming next",
+    "upcomingHint": "Creating and viewing skill packs are ready. Editing, filters, complete exports and management are being completed.",
     "categoryAdded": "Category created.",
     "categoryExists": "This category already exists."
+  },
+  "sparkMaterials": {
+    "intro": "Add notes or a TXT file, at least one single-channel EEG Excel, and optional images. Your original files stay unchanged.",
+    "templateNotice": "timestamp_ms: milliseconds. value: device raw values, without a physical unit. Originals are preserved byte for byte.",
+    "limits": "Current limits: 512 KiB per original, 3 MiB total and 12 attachments. Excel: {{rows}} samples; notes and text: {{chars}} characters.",
+    "passed": "Materials passed the local check. Save to share the complete pack.",
+    "notSaved": "Saving shares all materials together. Unsaved inputs are kept only on this page.",
+    "preparing": "Preparing original files…",
+    "committing": "Saving all materials together… This step cannot be cancelled.",
+    "cancel": "Cancel saving",
+    "cancelled": "Save cancelled. Your inputs and selected files are kept; save again when ready."
   }
 }

@@ -44,7 +44,8 @@
     "emulators:spark": "node scripts/spark.mjs start",
     "dev:spark": "VITE_DATA_BACKEND=spark VITE_FIREBASE_PROJECT_ID=demo-evertrace-spark VITE_AUTH_EMULATOR_PORT=29199 VITE_FIRESTORE_EMULATOR_PORT=28190 npm exec --workspace @evertrace/web -- vite --host 127.0.0.1 --port 5175 --strictPort",
     "admin:spark": "node scripts/spark-admin.mjs",
-    "verify:spark": "npm run typecheck && npm run lint && npm run test:spark:s1 && npm run build --workspace @evertrace/web"
+    "verify:spark": "npm run typecheck && npm run lint && node scripts/spark.mjs rules && npm run test:spark:s2 && npm run build --workspace @evertrace/web",
+    "test:spark:s2": "node scripts/spark.mjs s2"
   },
   "devDependencies": {
     "node": "22.23.3",

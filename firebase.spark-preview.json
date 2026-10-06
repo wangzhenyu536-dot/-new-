@@ -1,6 +1,7 @@
 {
   "firestore": {
-    "rules": "firebase/spark.rules"
+    "rules": "firebase/spark.rules",
+    "indexes": "firebase/spark.indexes.json"
   },
   "emulators": {
     "auth": {
