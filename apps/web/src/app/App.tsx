@@ -1,19 +1,23 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { HomePage } from '../pages/HomePage';
-import { PreviewPage } from '../pages/PreviewPage';
-import { AccountPage } from '../pages/AccountPage';
-import { CreatePackPage } from '../pages/CreatePackPage';
-import { PacksPage } from '../pages/PacksPage';
-import { PackDetailPage } from '../pages/PackDetailPage';
-import { CategoriesPage } from '../pages/CategoriesPage';
-import { MembersPage } from '../pages/MembersPage';
+const PreviewPage = lazy(() => import('../pages/PreviewPage').then(module => ({ default: module.PreviewPage })));
+const AccountPage = lazy(() => import('../pages/AccountPage').then(module => ({ default: module.AccountPage })));
+const CreatePackPage = lazy(() => import('../pages/CreatePackPage').then(module => ({ default: module.CreatePackPage })));
+const PacksPage = lazy(() => import('../pages/PacksPage').then(module => ({ default: module.PacksPage })));
+const PackDetailPage = lazy(() => import('../pages/PackDetailPage').then(module => ({ default: module.PackDetailPage })));
+const CategoriesPage = lazy(() => import('../pages/CategoriesPage').then(module => ({ default: module.CategoriesPage })));
+const MembersPage = lazy(() => import('../pages/MembersPage').then(module => ({ default: module.MembersPage })));
+import { RouteLoading } from '../components/AccountRedirect';
+import { isSpark } from './environment';
+const SparkWorkspacePage = lazy(() => import('../pages/SparkWorkspacePage').then(module => ({default:module.SparkWorkspacePage})));
+const SparkCategoriesPage = lazy(() => import('../pages/SparkCategoriesPage').then(module => ({default:module.SparkCategoriesPage})));
 import { AuthProvider } from './AuthProvider';
 import { AccessGate } from '../components/AccessGate';
 export function App() {
   const { i18n } = useTranslation(); const location = useLocation();
   useEffect(() => { document.documentElement.lang = i18n.resolvedLanguage ?? 'en'; }, [i18n.resolvedLanguage]);
   useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
-  return <AuthProvider><Routes><Route path="/" element={<HomePage />} /><Route path="/packs/new" element={<AccessGate><CreatePackPage /></AccessGate>} /><Route path="/packs" element={<AccessGate><PacksPage /></AccessGate>} /><Route path="/packs/:id/edit" element={<AccessGate><CreatePackPage edit /></AccessGate>} /><Route path="/packs/:id" element={<AccessGate><PackDetailPage /></AccessGate>} /><Route path="/admin/categories" element={<AccessGate admin><CategoriesPage /></AccessGate>} /><Route path="/admin/members" element={<AccessGate admin><MembersPage /></AccessGate>} /><Route path="/login" element={<AccountPage mode="login" />} /><Route path="/register" element={<AccountPage mode="register" />} /><Route path="/forgot-password" element={<AccountPage mode="reset" />} /><Route path="*" element={<PreviewPage title="notFound" hint="notFoundHint" />} /></Routes></AuthProvider>;
+  return <AuthProvider><Suspense fallback={<RouteLoading />}><Routes><Route path="/" element={<HomePage />} /><Route path="/packs/new" element={<AccessGate>{isSpark ? <SparkWorkspacePage upcoming /> : <CreatePackPage />}</AccessGate>} /><Route path="/packs" element={<AccessGate>{isSpark ? <SparkWorkspacePage /> : <PacksPage />}</AccessGate>} /><Route path="/packs/:id/edit" element={<AccessGate>{isSpark ? <SparkWorkspacePage upcoming /> : <CreatePackPage edit />}</AccessGate>} /><Route path="/packs/:id" element={<AccessGate>{isSpark ? <SparkWorkspacePage upcoming /> : <PackDetailPage />}</AccessGate>} /><Route path="/admin/categories" element={<AccessGate admin>{isSpark ? <SparkWorkspacePage upcoming /> : <CategoriesPage />}</AccessGate>} /><Route path="/admin/members" element={<AccessGate admin>{isSpark ? <SparkWorkspacePage upcoming /> : <MembersPage />}</AccessGate>} /><Route path="/categories" element={isSpark ? <AccessGate><SparkCategoriesPage /></AccessGate> : <PreviewPage title="notFound" hint="notFoundHint" />} /><Route path="/login" element={<AccountPage mode="login" />} /><Route path="/register" element={<AccountPage mode="register" />} /><Route path="/forgot-password" element={<AccountPage mode="reset" />} /><Route path="*" element={<PreviewPage title="notFound" hint="notFoundHint" />} /></Routes></Suspense></AuthProvider>;
 }

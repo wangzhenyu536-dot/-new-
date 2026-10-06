@@ -1,0 +1,72 @@
+rules_version = '2';
+// Spark business rules. Auth/Firestore only; undeveloped operations remain denied.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function userPath(uid) { return /databases/$(database)/documents/users/$(uid); }
+    function rolesPath() { return /databases/$(database)/documents/system/roles; }
+    function receiptPath(id) { return /databases/$(database)/documents/roleOps/$(id); }
+    function member() { return signedIn() && exists(userPath(request.auth.uid)) && get(userPath(request.auth.uid)).data.role in ['member','admin']; }
+    function admin() { return member() && get(userPath(request.auth.uid)).data.role == 'admin'; }
+    function exact(data, keys) { return data.keys().hasAll(keys) && data.keys().hasOnly(keys); }
+    function boundedString(value, limit) { return value is string && value.size() > 0 && value.size() <= limit; }
+    function validProfile(uid, data) {
+      return exact(data, ['uid','displayName','email','role']) && data.uid == uid
+        && boundedString(uid, 128) && boundedString(data.displayName, 120) && boundedString(data.email, 254)
+        && data.role in ['member', 'admin'];
+    }
+    function validRoleCommit(next, previous) {
+      let beforeUser = get(userPath(next.changedUid)).data;
+      let afterUser = getAfter(userPath(next.changedUid)).data;
+      let receipt = getAfter(receiptPath(next.operationId)).data;
+      return admin() && exact(next, ['adminCount','revision','changedUid','fromRole','toRole','operationId'])
+        && next.revision is int && next.revision == previous.revision + 1
+        && boundedString(next.changedUid, 128) && boundedString(next.operationId, 128)
+        && next.fromRole in ['member','admin'] && next.toRole in ['member','admin'] && next.fromRole != next.toRole
+        && next.adminCount is int && next.adminCount >= 1
+        && next.adminCount == previous.adminCount + (next.toRole == 'admin' ? 1 : -1)
+        && beforeUser.role == next.fromRole && afterUser.role == next.toRole
+        && !exists(receiptPath(next.operationId))
+        && exact(receipt, ['uid','actorId','fromRole','toRole','revision'])
+        && receipt.uid == next.changedUid && receipt.actorId == request.auth.uid
+        && receipt.fromRole == next.fromRole && receipt.toRole == next.toRole && receipt.revision == next.revision;
+    }
+    match /users/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || admin());
+      allow list: if admin();
+      allow create: if signedIn() && request.auth.uid == uid && validProfile(uid, request.resource.data)
+        && request.resource.data.role == 'member' && request.resource.data.email == request.auth.token.email;
+      allow update: if validProfile(uid, request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role'])
+        && getAfter(rolesPath()).data.changedUid == uid
+        && validRoleCommit(getAfter(rolesPath()).data, get(rolesPath()).data);
+      allow delete: if false;
+    }
+    function validCategory(id, data) {
+      return exact(data, ['name','status','createdBy','createdAt']) && boundedString(data.name,60)
+        && data.name.matches('[^/\\\\]+') && !(data.name in ['.','..'])
+        && !data.name.matches(' .*|.* |.*  .*')
+        && !data.name.matches('[\\s\\S]*[\\x00-\\x1f\\x7f\\x{0085}\\x{00a0}\\x{1680}\\x{2000}-\\x{200a}\\x{2028}\\x{2029}\\x{202f}\\x{205f}\\x{3000}\\x{feff}][\\s\\S]*')
+        && id == data.name.lower() && data.status == 'active'
+        && data.createdBy == request.auth.uid && data.createdAt is timestamp && data.createdAt == request.time;
+    }
+    match /categories/{id} {
+      allow read: if member();
+      allow create: if member() && validCategory(id, request.resource.data);
+      allow update, delete: if false;
+    }
+    match /system/roles {
+      allow read: if member();
+      allow update: if validRoleCommit(request.resource.data, resource.data);
+      allow create, delete: if false;
+    }
+    match /roleOps/{id} {
+      allow get: if admin() || (member() && resource.data.actorId == request.auth.uid);
+      allow list: if admin();
+      allow create: if id == getAfter(rolesPath()).data.operationId
+        && validRoleCommit(getAfter(rolesPath()).data, get(rolesPath()).data);
+      allow update, delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

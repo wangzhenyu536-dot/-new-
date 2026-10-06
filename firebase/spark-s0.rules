@@ -1,0 +1,190 @@
+rules_version = '2';
+// Isolated S0 proof. Production namespaces are deliberately not authorized here.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function userPath(uid) { return /databases/$(database)/documents/s0Users/$(uid); }
+    function packPath(id) { return /databases/$(database)/documents/s0Packs/$(id); }
+    function groupPath(id, group) { return /databases/$(database)/documents/s0Packs/$(id)/groups/$(group); }
+    function filePath(id, slot) { return /databases/$(database)/documents/s0Packs/$(id)/files/$(slot); }
+    function rolesPath() { return /databases/$(database)/documents/s0System/roles; }
+    function receiptPath(id) { return /databases/$(database)/documents/s0RoleOps/$(id); }
+    function member() {
+      return signedIn() && exists(userPath(request.auth.uid))
+        && get(userPath(request.auth.uid)).data.role in ['member', 'admin'];
+    }
+    function admin() { return member() && get(userPath(request.auth.uid)).data.role == 'admin'; }
+    function exact(data, keys) { return data.keys().hasAll(keys) && data.keys().hasOnly(keys); }
+    function boundedString(value, limit) { return value is string && value.size() > 0 && value.size() <= limit; }
+    function count(value) { return value is int && value >= 0 && value <= 12; }
+    function readablePack(id) { return member() && get(packPath(id)).data.status == 'ready'; }
+    // Every child mutation must advance the root in this same atomic request.
+    function changingPack(id) {
+      let previous = get(packPath(id));
+      let next = getAfter(packPath(id)).data;
+      return member() && next.status == 'ready'
+        && (previous == null
+          ? (next.version == 1 && next.ownerId == request.auth.uid)
+          : (previous.data.status == 'ready'
+            && (previous.data.ownerId == request.auth.uid || admin())
+            && next.ownerId == previous.data.ownerId && next.version == previous.data.version + 1));
+    }
+    // A version advance requires a root write, whose own rule checks authority.
+    // Repeating that authorization for 14 child writes exhausts rule expressions.
+    function advancingPack(id) {
+      let previous = get(packPath(id));
+      let next = getAfter(packPath(id)).data;
+      return previous == null ? next.version == 1 : next.version == previous.data.version + 1;
+    }
+    function meta(file) {
+      return {'kind': file.kind, 'name': file.name, 'mediaType': file.mediaType,
+        'size': file.size, 'sha256': file.sha256};
+    }
+    function validMeta(data) {
+      return exact(data, ['kind', 'name', 'mediaType', 'size', 'sha256'])
+        && boundedString(data.name, 160) && data.name.matches('[^/\\\\]+')
+        && data.size is int && data.size > 0 && data.size <= 524288
+        && data.sha256 is string && data.sha256.matches('[0-9a-f]{64}')
+        && ((data.kind == 'text' && data.mediaType == 'text/plain' && data.name.lower().matches('.*[.]txt'))
+          || (data.kind == 'eeg' && data.mediaType == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            && data.name.lower().matches('.*[.]xlsx'))
+          || (data.kind == 'image' && ((data.mediaType == 'image/png' && data.name.lower().matches('.*[.]png'))
+            || (data.mediaType == 'image/jpeg' && data.name.lower().matches('.*[.]jpe?g'))
+            || (data.mediaType == 'image/webp' && data.name.lower().matches('.*[.]webp')))));
+    }
+    function validFile(data, slot) {
+      return exact(data, ['slot', 'version', 'kind', 'name', 'mediaType', 'size', 'sha256', 'bytes'])
+        && data.slot == slot && data.version is int && data.version >= 1
+        && validMeta(meta(data)) && data.bytes is bytes && data.bytes.size() == data.size;
+    }
+    function slotGroup(slot) { return slot in ['0','1','2','3','4','5'] ? '0' : '1'; }
+    function listedFile(id, slot, data) {
+      let group = getAfter(groupPath(id, slotGroup(slot))).data;
+      return slot in group.slots && group.version == data.version && group.files[slot] == meta(data);
+    }
+    function validSlot(id, data, slot) {
+      let file = getAfter(filePath(id, slot));
+      return slot in data.slots
+        ? (file != null && file.data.slot == slot && file.data.version == data.version
+          && data.files[slot] == meta(file.data))
+        : file == null;
+    }
+    function groupTotals(data, slots) {
+      let a = data.files.get(slots[0], {'size': 0, 'kind': ''});
+      let b = data.files.get(slots[1], {'size': 0, 'kind': ''});
+      let c = data.files.get(slots[2], {'size': 0, 'kind': ''});
+      let d = data.files.get(slots[3], {'size': 0, 'kind': ''});
+      let e = data.files.get(slots[4], {'size': 0, 'kind': ''});
+      let f = data.files.get(slots[5], {'size': 0, 'kind': ''});
+      return data.totalBytes == a.size + b.size + c.size + d.size + e.size + f.size
+        && data.textCount == (a.kind == 'text' ? 1 : 0) + (b.kind == 'text' ? 1 : 0)
+          + (c.kind == 'text' ? 1 : 0) + (d.kind == 'text' ? 1 : 0) + (e.kind == 'text' ? 1 : 0) + (f.kind == 'text' ? 1 : 0)
+        && data.imageCount == (a.kind == 'image' ? 1 : 0) + (b.kind == 'image' ? 1 : 0)
+          + (c.kind == 'image' ? 1 : 0) + (d.kind == 'image' ? 1 : 0) + (e.kind == 'image' ? 1 : 0) + (f.kind == 'image' ? 1 : 0)
+        && data.eegCount == (a.kind == 'eeg' ? 1 : 0) + (b.kind == 'eeg' ? 1 : 0)
+          + (c.kind == 'eeg' ? 1 : 0) + (d.kind == 'eeg' ? 1 : 0) + (e.kind == 'eeg' ? 1 : 0) + (f.kind == 'eeg' ? 1 : 0);
+    }
+    function sixSlots(id, data, slots) {
+      return validSlot(id,data,slots[0]) && validSlot(id,data,slots[1]) && validSlot(id,data,slots[2])
+        && validSlot(id,data,slots[3]) && validSlot(id,data,slots[4]) && validSlot(id,data,slots[5])
+        && groupTotals(data,slots);
+    }
+    function validGroup(id, groupId, data) {
+      return groupId in ['0','1'] && advancingPack(id)
+        && exact(data, ['version','slots','totalBytes','textCount','imageCount','eegCount','files'])
+        && data.version == getAfter(packPath(id)).data.version
+        && data.slots is list && data.slots.size() <= 6 && data.slots.toSet().size() == data.slots.size()
+        && data.files is map && data.files.keys().hasAll(data.slots) && data.files.keys().hasOnly(data.slots)
+        && data.totalBytes is int && data.totalBytes >= 0 && data.totalBytes <= 3145728
+        && count(data.textCount) && count(data.imageCount) && count(data.eegCount)
+        && (groupId == '0'
+          ? (data.slots.hasOnly(['0','1','2','3','4','5']) && sixSlots(id,data,['0','1','2','3','4','5']))
+          : (data.slots.hasOnly(['6','7','8','9','10','11']) && sixSlots(id,data,['6','7','8','9','10','11'])));
+    }
+    function validPack(id, data) {
+      let first = getAfter(groupPath(id, '0')).data;
+      let second = getAfter(groupPath(id, '1')).data;
+      return changingPack(id)
+        && exact(data, ['title','titleSearch','textContent','ownerId','categoryId','version','status','totalBytes','textFileCount','imageCount','eegCount'])
+        && boundedString(data.title, 160) && data.title.matches('[\\s\\S]*\\S[\\s\\S]*')
+        && boundedString(data.titleSearch, 160) && boundedString(data.categoryId, 128)
+        && data.textContent is string && data.textContent.size() <= 100000
+        && data.version is int && data.version >= 1 && data.status == 'ready'
+        && get(/databases/$(database)/documents/s0Categories/$(data.categoryId)).data.status == 'active'
+        && first.version == data.version && second.version == data.version
+        && data.totalBytes is int && data.totalBytes <= 3145728 && data.totalBytes > 0
+        && data.totalBytes == first.totalBytes + second.totalBytes
+        && count(data.textFileCount) && count(data.imageCount) && count(data.eegCount)
+        && data.textFileCount == first.textCount + second.textCount
+        && data.imageCount == first.imageCount + second.imageCount
+        && data.eegCount == first.eegCount + second.eegCount
+        && data.textFileCount + data.imageCount + data.eegCount <= 12 && data.eegCount >= 1
+        && (data.textContent.matches('[\\s\\S]*\\S[\\s\\S]*') || data.textFileCount > 0);
+    }
+    function validProfile(uid, data) {
+      return exact(data, ['uid','displayName','email','role']) && data.uid == uid
+        && boundedString(uid, 128) && boundedString(data.displayName, 120) && boundedString(data.email, 254)
+        && data.role in ['member', 'admin'];
+    }
+    function validRoleCommit(next, previous) {
+      let beforeUser = get(userPath(next.changedUid)).data;
+      let afterUser = getAfter(userPath(next.changedUid)).data;
+      let receipt = getAfter(receiptPath(next.operationId)).data;
+      return admin() && exact(next, ['adminCount','revision','changedUid','fromRole','toRole','operationId'])
+        && next.revision is int && next.revision == previous.revision + 1
+        && boundedString(next.changedUid, 128) && boundedString(next.operationId, 128)
+        && next.fromRole in ['member','admin'] && next.toRole in ['member','admin'] && next.fromRole != next.toRole
+        && next.adminCount is int && next.adminCount >= 1
+        && next.adminCount == previous.adminCount + (next.toRole == 'admin' ? 1 : -1)
+        && beforeUser.role == next.fromRole && afterUser.role == next.toRole
+        && !exists(receiptPath(next.operationId))
+        && exact(receipt, ['uid','actorId','fromRole','toRole','revision'])
+        && receipt.uid == next.changedUid && receipt.actorId == request.auth.uid
+        && receipt.fromRole == next.fromRole && receipt.toRole == next.toRole && receipt.revision == next.revision;
+    }
+    match /s0Users/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || admin());
+      allow list: if admin();
+      allow create: if signedIn() && request.auth.uid == uid && validProfile(uid, request.resource.data)
+        && request.resource.data.role == 'member' && request.resource.data.email == request.auth.token.email;
+      allow update: if validProfile(uid, request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role'])
+        && getAfter(rolesPath()).data.changedUid == uid
+        && validRoleCommit(getAfter(rolesPath()).data, get(rolesPath()).data);
+      allow delete: if false;
+    }
+    match /s0Categories/{id} { allow read: if member(); allow write: if false; }
+    match /s0Packs/{id} {
+      allow read: if member() && resource.data.status == 'ready';
+      allow create, update: if validPack(id, request.resource.data);
+      allow delete: if false;
+      match /groups/{groupId} {
+        allow read: if readablePack(id);
+        allow create, update: if validGroup(id, groupId, request.resource.data);
+        allow delete: if false;
+      }
+      match /files/{slot} {
+        allow read: if readablePack(id);
+        allow create, update: if slot in ['0','1','2','3','4','5','6','7','8','9','10','11']
+          && advancingPack(id) && validFile(request.resource.data, slot)
+          && request.resource.data.version == getAfter(packPath(id)).data.version
+          && listedFile(id, slot, request.resource.data);
+        allow delete: if slot in ['0','1','2','3','4','5','6','7','8','9','10','11']
+          && advancingPack(id) && !(slot in getAfter(groupPath(id, slotGroup(slot))).data.slots);
+      }
+    }
+    match /s0System/roles {
+      allow read: if member();
+      allow update: if validRoleCommit(request.resource.data, resource.data);
+      allow create, delete: if false;
+    }
+    match /s0RoleOps/{id} {
+      allow get: if admin() || (member() && resource.data.actorId == request.auth.uid);
+      allow list: if admin();
+      allow create: if id == getAfter(rolesPath()).data.operationId
+        && validRoleCommit(getAfter(rolesPath()).data, get(rolesPath()).data);
+      allow update, delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

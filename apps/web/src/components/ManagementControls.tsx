@@ -3,8 +3,8 @@ import { FirebaseError } from 'firebase/app';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../app/AuthProvider';
-import { db, functions } from '../app/firebase';
+import { useAuth } from '../app/useAuth';
+import { db, functions } from '../app/legacy-firebase';
 export type ManagementResult={operationId:string;status:'done'|'pending';moved?:number};
 export function managementError(error:unknown){const e=error as FirebaseError&{details?:{code?:string}};const code=e.details?.code;if(['versionConflict','saveBusy','operationBusy','categoryUnavailable','targetRequired','deletePending','categoryCountMismatch'].includes(code??''))return 'management.'+code;if(e.code==='functions/already-exists')return 'management.nameExists';if(e.code==='functions/permission-denied')return 'management.permissionDenied';if(e.code==='functions/invalid-argument')return 'management.invalid';return 'management.failed';}
 export function ConfirmationDialog({title,busy,onClose,children}:{title:string;busy:boolean;onClose:()=>void;children:ReactNode}){

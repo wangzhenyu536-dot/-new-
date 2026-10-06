@@ -3,7 +3,7 @@ import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {Link,useSearchParams} from 'react-router-dom';
 import {collection,getDocsFromServer} from 'firebase/firestore';
 import {useTranslation} from 'react-i18next';
-import {useAuth} from '../app/AuthProvider';
+import {useAuth} from '../app/useAuth';
 import {db} from '../app/firebase';
 import {AccountLayout} from '../components/AccountLayout';
 import {MemberBar} from '../components/MemberBar';

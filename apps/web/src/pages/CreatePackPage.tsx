@@ -5,8 +5,8 @@ import { collection, doc, getDoc, getDocs, onSnapshot, query, where } from 'fire
 import { httpsCallable } from 'firebase/functions';
 import { FirebaseError } from 'firebase/app';
 import { PREVIEW_LIMITS, ATTACHMENT_LIMITS, checkImageHeader, validatePackInput, validateText, type EegResult, type Issue, type FileKind, type StoredFile } from '@evertrace/shared';
-import { db, functions } from '../app/firebase';
-import { useAuth } from '../app/AuthProvider';
+import { db, functions } from '../app/legacy-firebase';
+import { useAuth } from '../app/useAuth';
 import { AccountLayout } from '../components/AccountLayout';
 import { MemberBar } from '../components/MemberBar';
 import { EegPreview } from '../components/EegPreview';

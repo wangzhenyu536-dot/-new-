@@ -18,3 +18,4 @@ __pycache__/
 !.env.example
 # Historic data is preserved; new local captures are not source code.
 data/
+dist-cloud/

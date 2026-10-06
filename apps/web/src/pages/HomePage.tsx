@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { Lines } from '../components/Lines';
-import { useAuth } from '../app/AuthProvider';
+import { useAuth } from '../app/useAuth';
 
 export function HomePage() {
   const { t } = useTranslation();

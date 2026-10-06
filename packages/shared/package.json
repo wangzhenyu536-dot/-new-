@@ -7,6 +7,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./src/index.ts"
+    },
+    "./firebase-config": {
+      "types": "./dist/firebase-config.d.ts",
+      "default": "./src/firebase-config.ts"
     }
   },
   "dependencies": {
@@ -16,5 +20,6 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"
-  }
+  },
+  "sideEffects": false
 }

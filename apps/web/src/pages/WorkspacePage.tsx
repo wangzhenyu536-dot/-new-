@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../app/AuthProvider';
+import { useAuth } from '../app/useAuth';
 import { AccountLayout } from '../components/AccountLayout';
 export function WorkspacePage({ kind }: { kind: 'create' | 'browse' | 'admin' }) {
   const { t } = useTranslation(), access = useAuth(), [error, setError] = useState(false);

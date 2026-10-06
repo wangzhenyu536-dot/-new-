@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from 'react';
-import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FirebaseError } from 'firebase/app';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../app/firebase';
-import { useAuth } from '../app/AuthProvider';
+import { useAuth } from '../app/useAuth';
 import { AccountLayout } from '../components/AccountLayout';
+import { AccountRedirect } from '../components/AccountRedirect';
 import { AccountPending, safeReturnTo } from '../components/AccessGate';
 export function AccountPage({ mode }: { mode: 'login' | 'register' | 'reset' }) {
   const { t } = useTranslation(), access = useAuth(), [params] = useSearchParams();
@@ -13,7 +14,7 @@ export function AccountPage({ mode }: { mode: 'login' | 'register' | 'reset' }) 
   const [error, setError] = useState(''), [busy, setBusy] = useState(false), [sent, setSent] = useState(false);
   const returnTo = safeReturnTo(params.get('returnTo')), suffix = `?returnTo=${encodeURIComponent(returnTo)}`;
   if (access.status !== 'ready') return <AccountPending />;
-  if (access.user && mode !== 'reset') return <Navigate to={returnTo} replace />;
+  if (access.user && mode !== 'reset') return <AccountRedirect to={returnTo} />;
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (busy) return; setError('');
     if (mode === 'register' && password !== confirm) { setError('account.mismatch'); return; }

@@ -5,8 +5,8 @@ import { collection, doc, getDoc, getDocs, query, where, type Timestamp } from '
 import { getBytes, ref } from 'firebase/storage';
 import { useTranslation } from 'react-i18next';
 import { PREVIEW_LIMITS, validateText, type StoredFile, type EegResult, type Issue } from '@evertrace/shared';
-import { useAuth } from '../app/AuthProvider';
-import { db, storage } from '../app/firebase';
+import { useAuth } from '../app/useAuth';
+import { db, storage } from '../app/legacy-firebase';
 import { AccountLayout } from '../components/AccountLayout';
 import { MemberBar } from '../components/MemberBar';
 import { IssueList } from '../components/IssueList';

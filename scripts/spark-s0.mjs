@@ -1,0 +1,22 @@
+import { spawn } from 'node:child_process';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root = fileURLToPath(new URL('..', import.meta.url));
+const mode = process.argv[2] || 'verify';
+if (!['red', 'verify'].includes(mode)) throw new Error('Use red or verify.');
+const temporary = path.join(root, '.runtime/spark-s0-tmp');
+const working = path.join(root, '.runtime/spark-s0-run');
+for (const directory of [temporary, working, path.join(root, 'outputs/S0')]) mkdirSync(directory, { recursive: true });
+const environment = { ...process.env, PATH: path.join(root, 'node_modules/.bin') + path.delimiter + (process.env.PATH || ''), TMPDIR: temporary, TMP: temporary, TEMP: temporary, METADATA_SERVER_DETECTION: 'none', FIREBASE_EMULATORS_PATH: path.join(root, '.cache/firebase') };
+for (const key of Object.keys(environment)) if (key.endsWith('_EMULATOR_HOST')) delete environment[key];
+environment.SPARK_S0_RED = mode === 'red' ? '1' : '0';
+const java = path.join(root, '.runtime/java');
+if (existsSync(path.join(java, 'bin/java'))) { environment.JAVA_HOME = java; environment.PATH = path.join(java, 'bin') + path.delimiter + environment.PATH; }
+const quote = value => "'" + value.replaceAll("'", "'\"'\"'") + "'";
+const command = [path.join(root, 'node_modules/.bin/node'), path.join(root, 'node_modules/vitest/vitest.mjs'), 'run', '--config', path.join(root, 'vitest.spark.config.ts')].map(quote).join(' ');
+writeFileSync(path.join(root, 'outputs/S0/isolation.json'), JSON.stringify({ projectId: 'demo-evertrace-spark-s0', firestorePort: 28080, websocketPort: 28081, hubPort: 28440, loggingPort: 28450, temporary, working, services: ['firestore'], mode, cloudDeployed: false }, null, 2));
+const child = spawn(path.join(root, 'node_modules/.bin/firebase'), ['emulators:exec', '--config', path.join(root, 'firebase.spark-test.json'), '--project', 'demo-evertrace-spark-s0', '--only', 'firestore', command], { cwd: working, env: environment, stdio: 'inherit' });
+child.on('error', error => { console.error(error.message); process.exitCode = 1; });
+child.on('exit', code => { process.exitCode = code ?? 1; });
+for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child.kill(signal));

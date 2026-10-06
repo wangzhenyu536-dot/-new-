@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { useTranslation } from 'react-i18next';
-import { db, functions } from '../app/firebase';
+import { db, functions } from '../app/legacy-firebase';
 import { AccountLayout } from '../components/AccountLayout';
 import { MemberBar } from '../components/MemberBar';
 import { ConfirmationDialog, PendingOperations, managementError, type ManagementResult } from '../components/ManagementControls';

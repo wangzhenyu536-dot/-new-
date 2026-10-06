@@ -2,7 +2,7 @@ import { FirebaseError } from 'firebase/app';
 import { httpsCallable } from 'firebase/functions';
 import { getMetadata, ref, uploadBytesResumable, type UploadTask } from 'firebase/storage';
 import type { BeginUploadInput, UploadSession, SaveResult, FileKind } from '@evertrace/shared';
-import { functions, storage } from '../app/firebase';
+import { functions, storage } from '../app/legacy-firebase';
 export type SaveAttempt = { fingerprint: string; requestId: string };
 export async function saveMaterials(input:{title:string;categoryId:string;textContent:string;attachments:{file:File;kind:FileKind}[];packId?:string;expectedVersion?:number;retainedFileIds?:string[]},attempt:{current:SaveAttempt|null},progress:(state:{phase:string;file?:string;percent?:number})=>void,signal:AbortSignal) {
   progress({phase:'preparing'});const selected=input.attachments;
