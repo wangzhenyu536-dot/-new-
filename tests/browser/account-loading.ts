@@ -13,7 +13,7 @@ export async function registerAccount(page: Page, email: string, name = 'Loading
 
 // Hold a genuinely cold route module rather than the account/profile request.
 export async function holdPageModule(page: Page, moduleName: string) {
-  const pattern = new RegExp(`/src/pages/${moduleName}\\.tsx(?:\\?|$)`);
+  const pattern = new RegExp(`/(?:src/pages/${moduleName}\\.tsx|assets/${moduleName}-[^/]+\\.js)(?:\\?|$)`);
   let release!: () => void;
   let markRequested!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });

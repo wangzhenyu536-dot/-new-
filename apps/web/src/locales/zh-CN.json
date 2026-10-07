@@ -163,7 +163,10 @@
     "membersHint": "管理成员角色，社区须保留至少一名管理员。",
     "connected": "你的账户已连接到社区资料库。",
     "workspaceNext": "R4 将提供多附件与编辑。",
-    "workspaceNav": "工作区导航"
+    "workspaceNav": "工作区导航",
+    "profileErrorCloud": "无法加载账户档案，请检查网络后重试。如果仍无法进入，请联系社区管理员。",
+    "networkCloud": "无法连接，请检查网络后重试。",
+    "resetSentCloud": "如果此邮箱已注册，已请求发送重置链接。请检查收件箱和垃圾邮件。"
   },
   "form": {
     "intro": "填写技能资料，添加文本和单通道脑电 Excel，检查材料是否完整。",

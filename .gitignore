@@ -19,3 +19,5 @@ __pycache__/
 # Historic data is preserved; new local captures are not source code.
 data/
 dist-cloud/
+dist-spark/
+dist-spark-test/

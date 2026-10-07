@@ -44,11 +44,14 @@
     "emulators:spark": "node scripts/spark.mjs start",
     "dev:spark": "VITE_DATA_BACKEND=spark VITE_FIREBASE_PROJECT_ID=demo-evertrace-spark VITE_AUTH_EMULATOR_PORT=29199 VITE_FIRESTORE_EMULATOR_PORT=28190 npm exec --workspace @evertrace/web -- vite --host 127.0.0.1 --port 5175 --strictPort",
     "admin:spark": "node scripts/spark-admin.mjs",
-    "verify:spark": "npm run typecheck && npm run lint && node scripts/spark.mjs s4-regression && node scripts/spark.mjs s4-e2e && npm run build --workspace @evertrace/web",
+    "verify:spark": "npm run typecheck && npm run lint && npm run test:spark:s5 && node scripts/spark.mjs s5-regression && node scripts/spark.mjs s5-e2e && node scripts/spark.mjs s5-built-e2e && npm run build --workspace @evertrace/web",
     "test:spark:s2": "node scripts/spark.mjs s2",
     "test:spark:s3": "node scripts/spark.mjs s3",
     "test:spark:s4": "node scripts/spark.mjs s4",
-    "schema:spark": "node scripts/spark-schema.mjs"
+    "schema:spark": "node scripts/spark-schema.mjs",
+    "cloud:spark:prepare": "node scripts/spark-release.mjs prepare",
+    "cloud:spark:deploy": "node scripts/spark-release.mjs deploy",
+    "test:spark:s5": "vitest run --config vitest.spark-s5.config.ts"
   },
   "devDependencies": {
     "node": "22.23.3",

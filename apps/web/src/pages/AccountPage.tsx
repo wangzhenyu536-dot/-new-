@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { FirebaseError } from 'firebase/app';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../app/firebase';
+import { isLocal } from '../app/environment';
 import { useAuth } from '../app/useAuth';
 import { AccountLayout } from '../components/AccountLayout';
 import { AccountRedirect } from '../components/AccountRedirect';
@@ -26,7 +27,7 @@ export function AccountPage({ mode }: { mode: 'login' | 'register' | 'reset' }) 
     } catch (e) {
       const code = e instanceof FirebaseError ? e.code : '';
       if (mode === 'reset' && code === 'auth/user-not-found') setSent(true);
-      else setError(({ 'auth/email-already-in-use': 'account.duplicate', 'auth/invalid-email': 'account.invalidEmail', 'auth/weak-password': 'account.weak', 'auth/invalid-credential': 'account.credentials', 'auth/wrong-password': 'account.credentials', 'auth/user-not-found': 'account.credentials', 'auth/user-disabled': 'account.disabled', 'auth/too-many-requests': 'account.tooMany' } as Record<string, string>)[code] || 'account.network');
+      else setError(({ 'auth/email-already-in-use': 'account.duplicate', 'auth/invalid-email': 'account.invalidEmail', 'auth/weak-password': 'account.weak', 'auth/invalid-credential': 'account.credentials', 'auth/wrong-password': 'account.credentials', 'auth/user-not-found': 'account.credentials', 'auth/user-disabled': 'account.disabled', 'auth/too-many-requests': 'account.tooMany' } as Record<string, string>)[code] || (isLocal ? 'account.network' : 'account.networkCloud'));
     } finally { setBusy(false); }
   }
   return <AccountLayout><h1>{t(mode === 'login' ? 'loginTitle' : mode === 'register' ? 'registerTitle' : 'forgotTitle')}</h1><p className="account-intro">{t(`account.${mode}Hint`)}</p>
@@ -35,7 +36,7 @@ export function AccountPage({ mode }: { mode: 'login' | 'register' | 'reset' }) 
       <label>{t('account.email')}<input name="email" type="email" autoComplete="email" required value={email} onChange={e => { setEmail(e.target.value); setSent(false); }} /></label>
       {mode !== 'reset' && <label>{t('account.password')}<input name="password" type="password" required minLength={mode === 'register' ? 6 : undefined} autoComplete={mode === 'register' ? 'new-password' : 'current-password'} value={password} onChange={e => setPassword(e.target.value)} /></label>}
       {mode === 'register' && <><small>{t('account.passwordHint')}</small><label>{t('account.confirm')}<input name="confirm" type="password" required autoComplete="new-password" value={confirm} onChange={e => setConfirm(e.target.value)} /></label></>}
-      {error && <p className="form-message" role="alert">{t(error)}</p>}{sent && <p className="form-message" role="status">{t('account.resetSent')}</p>}
+      {error && <p className="form-message" role="alert">{t(error)}</p>}{sent && <p className="form-message" role="status">{t(isLocal ? 'account.resetSent' : 'account.resetSentCloud')}</p>}
       <button className="button button-dark" type="submit" disabled={busy}>{t(busy ? 'account.working' : mode === 'login' ? 'account.submitLogin' : mode === 'register' ? 'account.submitRegister' : 'account.submitReset')} <span aria-hidden="true">↗</span></button>
     </form><div className="account-links">{mode === 'login' ? <><Link to={`/register${suffix}`}>{t('account.submitRegister')}</Link><Link to="/forgot-password">{t('forgotTitle')}</Link></> : <Link to={`/login${suffix}`}>{t('account.submitLogin')}</Link>}</div>
   </AccountLayout>;

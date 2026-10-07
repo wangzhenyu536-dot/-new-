@@ -163,7 +163,10 @@
     "membersHint": "Manage member roles and keep at least one administrator.",
     "connected": "Your account is connected to the community archive.",
     "workspaceNext": "More attachments and editing arrive in R4.",
-    "workspaceNav": "Workspace navigation"
+    "workspaceNav": "Workspace navigation",
+    "profileErrorCloud": "Could not load your account profile. Check your connection and retry. If this continues, contact the community administrator.",
+    "networkCloud": "Could not connect. Check your internet connection and try again.",
+    "resetSentCloud": "If an account exists for this email, a reset link has been requested. Check your inbox and spam folder."
   },
   "form": {
     "intro": "Bring a skill into focus. Add its notes and a single-channel EEG Excel, then check your materials.",

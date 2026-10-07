@@ -19,6 +19,7 @@
     "vitest.spark-s1.config.ts",
     "vitest.spark-s2.config.ts",
     "vitest.spark-s3.config.ts",
-    "vitest.spark-s4.config.ts"
+    "vitest.spark-s4.config.ts",
+    "vitest.spark-s5.config.ts"
   ]
 }

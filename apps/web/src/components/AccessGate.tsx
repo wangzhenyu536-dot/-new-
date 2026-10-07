@@ -4,10 +4,11 @@ import { useState, type ReactNode } from 'react';
 import { useAuth } from '../app/useAuth';
 import { AccountRedirect } from './AccountRedirect';
 import { AccountLayout } from './AccountLayout';
+import { isLocal } from '../app/environment';
 export function safeReturnTo(value: string | null) { return value && value.length<=4096 && (/^\/packs\?[^#]*$/.test(value) || ['/packs', '/categories', '/packs/new', '/admin/members', '/admin/categories'].includes(value) || /^\/packs\/[A-Za-z0-9_-]{1,100}(?:\/edit)?$/.test(value)) ? value : '/packs'; }
 export function AccountPending() {
   const { t } = useTranslation(), access = useAuth(); const [error, setError] = useState(false);
-  return <AccountLayout>{access.status === 'loading' ? <p role="status">{t('account.loading')}</p> : <><h1>{t('account.unavailable')}</h1><p role="alert">{t('account.profileError')}</p><div className="account-actions"><button className="button button-dark" onClick={access.retry}>{t('account.retry')}</button><button className="button" onClick={() => { void access.logout().catch(() => setError(true)); }}>{t('account.signOut')}</button></div>{error && <p role="alert">{t('account.network')}</p>}</>}</AccountLayout>;
+  return <AccountLayout>{access.status === 'loading' ? <p role="status">{t('account.loading')}</p> : <><h1>{t('account.unavailable')}</h1><p role="alert">{t(isLocal ? 'account.profileError' : 'account.profileErrorCloud')}</p><div className="account-actions"><button className="button button-dark" onClick={access.retry}>{t('account.retry')}</button><button className="button" onClick={() => { void access.logout().catch(() => setError(true)); }}>{t('account.signOut')}</button></div>{error && <p role="alert">{t(isLocal ? 'account.network' : 'account.networkCloud')}</p>}</>}</AccountLayout>;
 }
 export function AccessGate({ children, admin = false }: { children: ReactNode; admin?: boolean }) {
   const access = useAuth(), location = useLocation(), { t } = useTranslation();
