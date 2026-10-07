@@ -15,12 +15,25 @@ service cloud.firestore {
     function boundedString(value, limit) { return value is string && value.size() > 0 && value.size() <= limit; }
     function count(value) { return value is int && value >= 0 && value <= 12; }
     function readablePack(id) { return member() && get(packPath(id)).data.status == 'ready'; }
-    // Only a fresh parent can authorize children. Its create rule checks the member and owner.
-    // Repeating that authorization on every child exhausts rule expression limits.
-    function creatingPack(id) {
+    // A parent version advance requires a root write whose rule checks identity and authority.
+    // Children share this atomic proof rather than repeating authorization for every original.
+    function advancingPack(id) {
       let previous = get(packPath(id));
       let next = getAfter(packPath(id)).data;
-      return previous == null && next.version == 1;
+      return previous == null ? next.version == 1
+        : previous.data.status == 'ready' && next.version == previous.data.version + 1;
+    }
+    function validCreation(data) {
+      return member() && data.ownerId == request.auth.uid
+        && data.ownerName == get(userPath(request.auth.uid)).data.displayName
+        && data.version == 1 && data.createdAt == request.time;
+    }
+    function validEdit(data) {
+      return member() && resource.data.status == 'ready'
+        && (resource.data.ownerId == request.auth.uid || admin())
+        && data.ownerId == resource.data.ownerId && data.ownerName == resource.data.ownerName
+        && data.createdAt == resource.data.createdAt && data.version == resource.data.version + 1
+        && data.submissionHash != resource.data.submissionHash;
     }
     function meta(file) {
       return {'kind': file.kind, 'name': file.name, 'mediaType': file.mediaType,
@@ -77,7 +90,7 @@ service cloud.firestore {
         && groupTotals(data,slots);
     }
     function validGroup(id, groupId, data) {
-      return groupId in ['0','1'] && creatingPack(id)
+      return groupId in ['0','1'] && advancingPack(id)
         && exact(data, ['version','slots','totalBytes','textCount','imageCount','eegCount','files'])
         && data.version is int && data.version == getAfter(packPath(id)).data.version
         && data.slots is list && data.slots.size() <= 6 && data.slots.toSet().size() == data.slots.size()
@@ -91,20 +104,19 @@ service cloud.firestore {
     function validPack(id, data) {
       let first = getAfter(groupPath(id, '0')).data;
       let second = getAfter(groupPath(id, '1')).data;
-      return member() && data.ownerId == request.auth.uid
-        && exact(data, ['title','titleSearch','textContent','ownerId','ownerName','categoryId','version','status',
+      return exact(data, ['title','titleSearch','textContent','ownerId','ownerName','categoryId','version','status',
           'totalBytes','textFileCount','imageCount','eegCount','createdAt','updatedAt','submissionHash'])
         && boundedString(data.title, 160) && data.title.matches('[\\s\\S]*\\S[\\s\\S]*')
         && boundedString(data.titleSearch, 1500) && data.titleSearch.toUtf8().size() <= 1500
-        && boundedString(data.ownerName, 120) && data.ownerName == get(userPath(request.auth.uid)).data.displayName
+        && boundedString(data.ownerId, 128) && boundedString(data.ownerName, 120)
         && boundedString(data.categoryId, 60)
         && data.textContent is string && data.textContent.size() <= 100000
-        && data.version is int && data.version == 1 && data.status == 'ready'
-        && data.createdAt is timestamp && data.createdAt == request.time
+        && data.version is int && data.version >= 1 && data.status == 'ready'
+        && data.createdAt is timestamp
         && data.updatedAt is timestamp && data.updatedAt == request.time
         && data.submissionHash is string && data.submissionHash.matches('[0-9a-f]{64}')
         && get(/databases/$(database)/documents/categories/$(data.categoryId)).data.status == 'active'
-        && first.version == 1 && second.version == 1
+        && first.version == data.version && second.version == data.version
         && data.totalBytes is int && data.totalBytes <= 3145728 && data.totalBytes > 0
         && data.totalBytes == first.totalBytes + second.totalBytes
         && count(data.textFileCount) && count(data.imageCount) && count(data.eegCount)
@@ -113,6 +125,189 @@ service cloud.firestore {
         && data.eegCount == first.eegCount + second.eegCount
         && data.textFileCount + data.imageCount + data.eegCount <= 12 && data.eegCount >= 1
         && (data.textContent.matches('[\\s\\S]*\\S[\\s\\S]*') || data.textFileCount > 0);
+    }
+    function categoryPath(id) { return /databases/$(database)/documents/categories/$(id); }
+    function statsPath(id) { return /databases/$(database)/documents/categoryStats/$(id); }
+    function keyPath(id) { return /databases/$(database)/documents/categoryKeys/$(id); }
+    function operationPath(id) { return /databases/$(database)/documents/sparkOperations/$(id); }
+    function statShape(data) {
+      return exact(data,['packCount','revision','packId','operationId','kind','updatedAt'])
+        && data.packCount is int && data.packCount >= 0 && data.revision is int && data.revision >= 0
+        && data.packId is string && data.packId.size() <= 128 && data.operationId is string && data.operationId.size() <= 128
+        && data.kind in ['init','createPack','movePack','deletePack'] && data.updatedAt is timestamp;
+    }
+    function freshStat(categoryId, packId, kind, operationId) {
+      let next = getAfter(statsPath(categoryId)).data;
+      return next.packId == packId && next.kind == kind
+        && next.operationId == operationId && next.updatedAt == request.time;
+    }
+    function createCount(id, data) { return freshStat(data.categoryId,id,'createPack',data.submissionHash); }
+    function editCounts(id, before, after) {
+      return get(categoryPath(before.categoryId)).data.status == 'active'
+        && (before.categoryId == after.categoryId
+          ? get(statsPath(after.categoryId)) != null
+          : freshStat(before.categoryId,id,'movePack',after.submissionHash)
+            && freshStat(after.categoryId,id,'movePack',after.submissionHash));
+    }
+    function validStatChange(categoryId, next) {
+      let beforePack = get(packPath(next.packId));
+      let afterPack = getAfter(packPath(next.packId));
+      return member() && statShape(next) && next.updatedAt == request.time
+        && next.revision == resource.data.revision + 1
+        && (next.kind == 'createPack'
+          ? beforePack == null && afterPack != null && afterPack.data.status == 'ready'
+            && afterPack.data.categoryId == categoryId && next.operationId == afterPack.data.submissionHash
+            && next.packCount == resource.data.packCount + 1
+          : next.kind == 'movePack'
+            ? beforePack != null && afterPack != null && beforePack.data.status == 'ready' && afterPack.data.status == 'ready'
+              && beforePack.data.categoryId != afterPack.data.categoryId
+              && (categoryId == beforePack.data.categoryId || categoryId == afterPack.data.categoryId)
+              && next.packCount == resource.data.packCount + (categoryId == afterPack.data.categoryId ? 1 : -1)
+              && (afterPack.data.version == beforePack.data.version + 1
+                ? next.operationId == afterPack.data.submissionHash
+                : afterPack.data.version == beforePack.data.version && next.operationId == 'category-' + beforePack.data.categoryId)
+            : next.kind == 'deletePack' && beforePack != null && beforePack.data.status == 'deleting' && afterPack == null
+              && beforePack.data.categoryId == categoryId && next.operationId == beforePack.data.deletionOperation
+              && next.packCount == resource.data.packCount - 1);
+    }
+    function operationShape(data) {
+      return exact(data,['kind','status','ownerId','actorId','packId','sourceId','targetId','categoryId','expectedVersion','moved','createdAt','updatedAt'])
+        && data.kind in ['deletePack','deleteCategory'] && data.status in ['pending','done']
+        && boundedString(data.ownerId,128) && boundedString(data.actorId,128)
+        && data.packId is string && data.packId.size() <= 128
+        && data.sourceId is string && data.sourceId.size() <= 60 && data.targetId is string && data.targetId.size() <= 60
+        && data.categoryId is string && data.categoryId.size() <= 60
+        && data.expectedVersion is int && data.expectedVersion >= 0 && data.moved is int && data.moved >= 0
+        && data.createdAt is timestamp && data.updatedAt is timestamp;
+    }
+    function canDelete(data) { return member() && (data.ownerId == request.auth.uid || admin()); }
+    function deletionReceipt(id, before, next) {
+      return operationShape(next) && next.kind == 'deletePack' && next.status == 'pending'
+        && next.ownerId == before.ownerId && next.actorId == request.auth.uid && next.packId == id
+        && next.sourceId == '' && next.targetId == '' && next.categoryId == before.categoryId
+        && next.expectedVersion == before.version && next.moved == 0
+        && next.createdAt == request.time && next.updatedAt == request.time;
+    }
+    function deletionStart(id, before, after) {
+      return before.status == 'ready' && canDelete(before)
+        && after.diff(before).affectedKeys().hasOnly(['status','updatedAt','deletionOperation'])
+        && after.status == 'deleting' && after.updatedAt == request.time && after.deletionOperation == 'pack-' + id
+        && get(categoryPath(before.categoryId)).data.status == 'active'
+        && !exists(operationPath(after.deletionOperation))
+        && deletionReceipt(id,before,getAfter(operationPath(after.deletionOperation)).data);
+    }
+    function cleanupPack(id) {
+      let pack = get(packPath(id)).data;
+      let operation = get(operationPath(pack.deletionOperation)).data;
+      return pack.status == 'deleting' && canDelete(pack) && pack.deletionOperation == 'pack-' + id
+        && operation.kind == 'deletePack' && operation.status == 'pending'
+        && operation.packId == id && operation.ownerId == pack.ownerId && operation.expectedVersion == pack.version;
+    }
+    function emptyGroupFiles(id, group) {
+      return group == '0'
+        ? getAfter(filePath(id,'0')) == null && getAfter(filePath(id,'1')) == null && getAfter(filePath(id,'2')) == null
+          && getAfter(filePath(id,'3')) == null && getAfter(filePath(id,'4')) == null && getAfter(filePath(id,'5')) == null
+        : getAfter(filePath(id,'6')) == null && getAfter(filePath(id,'7')) == null && getAfter(filePath(id,'8')) == null
+          && getAfter(filePath(id,'9')) == null && getAfter(filePath(id,'10')) == null && getAfter(filePath(id,'11')) == null;
+    }
+    function deletionFinish(id, before, previous, next) {
+      return canDelete(before) && before.status == 'deleting' && before.deletionOperation == 'pack-' + id
+        && previous.kind == 'deletePack' && previous.status == 'pending'
+        && previous.packId == id && previous.ownerId == before.ownerId && previous.expectedVersion == before.version
+        && operationShape(next) && next.status == 'done' && next.updatedAt == request.time
+        && next.diff(previous).affectedKeys().hasOnly(['status','updatedAt'])
+        && getAfter(groupPath(id,'0')) == null && getAfter(groupPath(id,'1')) == null
+        && freshStat(before.categoryId,id,'deletePack',before.deletionOperation);
+    }
+    function lockedCategory(before, after, status, operationId) {
+      return before.status == 'active' && after.status == status && after.operationId == operationId
+        && after.diff(before).affectedKeys().hasOnly(['status','operationId']);
+    }
+    function migrationStart(id, next) {
+      let source = get(categoryPath(next.sourceId)).data;
+      let target = next.targetId == '' ? {} : get(categoryPath(next.targetId)).data;
+      return admin() && operationShape(next) && next.kind == 'deleteCategory' && next.status == 'pending'
+        && id == 'category-' + next.sourceId && next.sourceId != next.targetId && next.packId == ''
+        && next.ownerId == request.auth.uid && next.actorId == request.auth.uid && next.categoryId == next.sourceId
+        && next.expectedVersion == 0 && next.moved == 0 && next.createdAt == request.time && next.updatedAt == request.time
+        && statShape(get(statsPath(next.sourceId)).data)
+        && lockedCategory(source,getAfter(categoryPath(next.sourceId)).data,'migrating',id)
+        && (next.targetId == '' ? get(statsPath(next.sourceId)).data.packCount == 0
+          : statShape(get(statsPath(next.targetId)).data) && lockedCategory(target,getAfter(categoryPath(next.targetId)).data,'locked',id));
+    }
+    function migrationMove(id, before, after) {
+      let source = get(categoryPath(before.categoryId)).data;
+      let target = get(categoryPath(after.categoryId)).data;
+      let previous = get(operationPath(source.operationId)).data;
+      let next = getAfter(operationPath(source.operationId)).data;
+      return admin() && before.status == 'ready' && after.status == 'ready' && before.categoryId != after.categoryId
+        && after.diff(before).affectedKeys().hasOnly(['categoryId','updatedAt']) && after.updatedAt == request.time
+        && source.status == 'migrating' && target.status == 'locked' && source.operationId == target.operationId
+        && source.operationId == 'category-' + before.categoryId
+        && previous.kind == 'deleteCategory' && previous.status == 'pending'
+        && previous.sourceId == before.categoryId && previous.targetId == after.categoryId
+        && operationShape(next) && next.status == 'pending' && next.moved == previous.moved + 1
+        && next.updatedAt == request.time && next.diff(previous).affectedKeys().hasOnly(['moved','updatedAt'])
+        && freshStat(before.categoryId,id,'movePack',source.operationId) && freshStat(after.categoryId,id,'movePack',source.operationId);
+    }
+    function migrationProgress(id, previous, next) {
+      let sourceStat = getAfter(statsPath(previous.sourceId)).data;
+      let targetStat = getAfter(statsPath(previous.targetId)).data;
+      return admin() && previous.kind == 'deleteCategory' && previous.status == 'pending'
+        && operationShape(next) && next.status == 'pending' && next.moved == previous.moved + 1
+        && next.updatedAt == request.time && next.diff(previous).affectedKeys().hasOnly(['moved','updatedAt'])
+        && sourceStat.packId == targetStat.packId && freshStat(previous.sourceId,sourceStat.packId,'movePack',id)
+        && freshStat(previous.targetId,sourceStat.packId,'movePack',id)
+        && get(packPath(sourceStat.packId)).data.categoryId == previous.sourceId
+        && getAfter(packPath(sourceStat.packId)).data.categoryId == previous.targetId;
+    }
+    function migrationFinish(id, previous, next) {
+      let source = get(categoryPath(previous.sourceId)).data;
+      let target = previous.targetId == '' ? {} : get(categoryPath(previous.targetId)).data;
+      let afterTarget = previous.targetId == '' ? {} : getAfter(categoryPath(previous.targetId)).data;
+      return admin() && previous.kind == 'deleteCategory' && previous.status == 'pending'
+        && id == 'category-' + previous.sourceId && source.status == 'migrating' && source.operationId == id
+        && (previous.targetId == '' || (target.status == 'locked' && target.operationId == id))
+        && operationShape(next) && next.status == 'done' && next.updatedAt == request.time
+        && next.diff(previous).affectedKeys().hasOnly(['status','updatedAt'])
+        && get(statsPath(previous.sourceId)).data.packCount == 0 && getAfter(statsPath(previous.sourceId)) == null
+        && getAfter(categoryPath(previous.sourceId)) == null && getAfter(keyPath(source.name.lower())) == null
+        && (previous.targetId == '' || (afterTarget.status == 'active' && !('operationId' in afterTarget)
+          && afterTarget.diff(target).affectedKeys().hasOnly(['status','operationId'])));
+    }
+    function canonicalCategoryName(name) {
+      return boundedString(name,60) && name.matches('[^/\\\\]+') && !(name in ['.','..'])
+        && !name.matches(' .*|.* |.*  .*')
+        && !name.matches('[\\s\\S]*[\\x00-\\x1f\\x7f\\x{0085}\\x{00a0}\\x{1680}\\x{2000}-\\x{200a}\\x{2028}\\x{2029}\\x{202f}\\x{205f}\\x{3000}\\x{feff}][\\s\\S]*');
+    }
+    function categoryCreate(id, data) {
+      let key = data.name.lower();
+      let stat = getAfter(statsPath(id)).data;
+      return member() && exact(data,['name','status','createdBy','createdAt']) && canonicalCategoryName(data.name)
+        && data.status == 'active' && data.createdBy == request.auth.uid && data.createdAt == request.time
+        && (id == key || (id.matches('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
+          && (exists(categoryPath(key)) || get(operationPath('category-' + key)).data.status == 'done')))
+        && !exists(operationPath('category-' + id))
+        && getAfter(keyPath(key)).data.categoryId == id
+        && statShape(stat) && stat.kind == 'init' && stat.packCount == 0 && stat.revision == 0
+        && stat.packId == '' && stat.operationId == '' && stat.updatedAt == request.time;
+    }
+    function categoryRename(id, before, after) {
+      return admin() && before.status == 'active' && after.status == 'active' && canonicalCategoryName(after.name)
+        && after.diff(before).affectedKeys().hasOnly(['name'])
+        && getAfter(keyPath(after.name.lower())).data.categoryId == id
+        && (after.name.lower() == before.name.lower() || getAfter(keyPath(before.name.lower())) == null);
+    }
+    function categoryLock(id, before, after) {
+      let operation = getAfter(operationPath(after.operationId)).data;
+      return before.status == 'active' && !exists(operationPath(after.operationId))
+        && ((after.status == 'migrating' && operation.sourceId == id) || (after.status == 'locked' && operation.targetId == id))
+        && migrationStart(after.operationId,operation);
+    }
+    function categoryUnlock(id, before, after) {
+      let previous = get(operationPath(before.operationId)).data;
+      return before.status == 'locked' && previous.targetId == id
+        && migrationFinish(before.operationId,previous,getAfter(operationPath(before.operationId)).data);
     }
     function validProfile(uid, data) {
       return exact(data, ['uid','displayName','email','role']) && data.uid == uid
@@ -146,37 +341,79 @@ service cloud.firestore {
         && validRoleCommit(getAfter(rolesPath()).data, get(rolesPath()).data);
       allow delete: if false;
     }
-    function validCategory(id, data) {
-      return exact(data, ['name','status','createdBy','createdAt']) && boundedString(data.name,60)
-        && data.name.matches('[^/\\\\]+') && !(data.name in ['.','..'])
-        && !data.name.matches(' .*|.* |.*  .*')
-        && !data.name.matches('[\\s\\S]*[\\x00-\\x1f\\x7f\\x{0085}\\x{00a0}\\x{1680}\\x{2000}-\\x{200a}\\x{2028}\\x{2029}\\x{202f}\\x{205f}\\x{3000}\\x{feff}][\\s\\S]*')
-        && id == data.name.lower() && data.status == 'active'
-        && data.createdBy == request.auth.uid && data.createdAt is timestamp && data.createdAt == request.time;
-    }
     match /categories/{id} {
       allow read: if member();
-      allow create: if member() && validCategory(id, request.resource.data);
-      allow update, delete: if false;
+      allow create: if categoryCreate(id,request.resource.data);
+      allow update: if categoryRename(id,resource.data,request.resource.data)
+        || categoryLock(id,resource.data,request.resource.data) || categoryUnlock(id,resource.data,request.resource.data);
+      allow delete: if resource.data.status == 'migrating'
+        && migrationFinish(resource.data.operationId,get(operationPath(resource.data.operationId)).data,getAfter(operationPath(resource.data.operationId)).data);
+    }
+    match /categoryKeys/{id} {
+      allow read: if member();
+      allow create: if member() && exact(request.resource.data,['categoryId'])
+        && boundedString(request.resource.data.categoryId,60)
+        && getAfter(categoryPath(request.resource.data.categoryId)).data.name.lower() == id
+        && (get(categoryPath(request.resource.data.categoryId)) == null
+          || get(categoryPath(request.resource.data.categoryId)).data.name != getAfter(categoryPath(request.resource.data.categoryId)).data.name);
+      allow update: if false;
+      allow delete: if admin() && get(categoryPath(resource.data.categoryId)).data.name.lower() == id
+        && (getAfter(categoryPath(resource.data.categoryId)) == null || getAfter(categoryPath(resource.data.categoryId)).data.name.lower() != id);
+    }
+    match /categoryStats/{id} {
+      allow read: if member();
+      allow create: if member() && get(categoryPath(id)) == null && getAfter(categoryPath(id)).data.createdAt == request.time
+        && statShape(request.resource.data) && request.resource.data.kind == 'init'
+        && request.resource.data.packCount == 0 && request.resource.data.revision == 0
+        && request.resource.data.packId == '' && request.resource.data.operationId == '' && request.resource.data.updatedAt == request.time;
+      allow update: if validStatChange(id,request.resource.data);
+      allow delete: if admin() && resource.data.packCount == 0 && get(categoryPath(id)).data.status == 'migrating'
+        && getAfter(categoryPath(id)) == null
+        && getAfter(operationPath(get(categoryPath(id)).data.operationId)).data.status == 'done';
     }
     match /packs/{id} {
-      // Missing own-attempt reads enable the create transaction; existing data must be ready.
-      allow get: if member() && (resource == null || resource.data.status == 'ready');
-      allow list: if member() && resource.data.status == 'ready';
-      allow create: if validPack(id, request.resource.data);
-      allow update, delete: if false;
+      allow get: if member() && (resource == null || resource.data.status == 'ready'
+        || (resource.data.status == 'deleting' && canDelete(resource.data)));
+      allow list: if admin() || (member() && resource.data.status == 'ready');
+      allow create: if boundedString(id,120) && !exists(operationPath('pack-' + id))
+        && validCreation(request.resource.data) && validPack(id,request.resource.data) && createCount(id,request.resource.data);
+      allow update: if request.resource.data.version == resource.data.version + 1
+        ? validEdit(request.resource.data) && validPack(id,request.resource.data) && editCounts(id,resource.data,request.resource.data)
+        : (request.resource.data.status == 'deleting' ? deletionStart(id,resource.data,request.resource.data)
+          : migrationMove(id,resource.data,request.resource.data));
+      allow delete: if deletionFinish(id,resource.data,get(operationPath(resource.data.deletionOperation)).data,getAfter(operationPath(resource.data.deletionOperation)).data);
       match /groups/{groupId} {
-        allow read: if readablePack(id);
-        allow create: if validGroup(id, groupId, request.resource.data);
-        allow update, delete: if false;
+        allow read: if readablePack(id) || cleanupPack(id);
+        allow create, update: if validGroup(id,groupId,request.resource.data);
+        allow delete: if groupId in ['0','1'] && cleanupPack(id) && emptyGroupFiles(id,groupId);
       }
       match /files/{slot} {
         allow read: if readablePack(id);
-        allow create: if slot in ['0','1','2','3','4','5','6','7','8','9','10','11']
-          && creatingPack(id) && validFile(request.resource.data, slot)
-          && request.resource.data.version == 1 && listedFile(id, slot, request.resource.data);
-        allow update, delete: if false;
+        allow create, update: if slot in ['0','1','2','3','4','5','6','7','8','9','10','11']
+          && advancingPack(id) && validFile(request.resource.data,slot)
+          && request.resource.data.version == getAfter(packPath(id)).data.version && listedFile(id,slot,request.resource.data);
+        allow delete: if slot in ['0','1','2','3','4','5','6','7','8','9','10','11'] && resource != null
+          && ((cleanupPack(id) && resource.data.slot == slot && resource.data.version == get(packPath(id)).data.version)
+            || (get(packPath(id)) != null && advancingPack(id)
+              && resource.data.slot == slot && resource.data.version == get(packPath(id)).data.version
+              && slot in get(groupPath(id,slotGroup(slot))).data.slots
+              && !(slot in getAfter(groupPath(id,slotGroup(slot))).data.slots)));
       }
+    }
+    match /sparkOperations/{id} {
+      allow get: if member() && (resource == null || admin() || (resource.data.kind == 'deletePack' && resource.data.ownerId == request.auth.uid)
+        || (resource.data.kind == 'deleteCategory' && resource.data.status == 'done'));
+      allow list: if admin() || (member() && resource.data.kind == 'deletePack' && resource.data.ownerId == request.auth.uid);
+      allow create: if request.resource.data.kind == 'deletePack'
+        ? (id == 'pack-' + request.resource.data.packId
+          && deletionStart(request.resource.data.packId,get(packPath(request.resource.data.packId)).data,getAfter(packPath(request.resource.data.packId)).data))
+        : migrationStart(id,request.resource.data);
+      allow update: if resource.data.status == 'pending'
+        && (resource.data.kind == 'deletePack'
+          ? (getAfter(packPath(resource.data.packId)) == null
+            && deletionFinish(resource.data.packId,get(packPath(resource.data.packId)).data,resource.data,request.resource.data))
+          : migrationProgress(id,resource.data,request.resource.data) || migrationFinish(id,resource.data,request.resource.data));
+      allow delete: if false;
     }
     match /system/roles {
       allow read: if member();

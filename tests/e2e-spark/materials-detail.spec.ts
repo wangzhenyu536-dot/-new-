@@ -25,6 +25,8 @@ async function fixture(bytes: Buffer, name: string, missingFile = false) {
   const batch = database.batch();
   batch.set(database.doc('users/' + user.uid), { uid: user.uid, email, displayName: 'S2 detail member', role: 'member' });
   batch.set(database.doc('categories/' + categoryId), { name: categoryId, status: 'active', createdBy: user.uid, createdAt: Timestamp.now() });
+  batch.set(database.doc('categoryKeys/' + categoryId.toLowerCase()), { categoryId });
+  batch.set(database.doc('categoryStats/' + categoryId), { packCount: 1, revision: 1, packId, operationId: digest(Buffer.from(title + meta.sha256)), kind: 'createPack', updatedAt: Timestamp.now() });
   batch.set(database.doc('packs/' + packId), { title, titleSearch: title.toLowerCase(), textContent: 'Synthetic detail failure fixture.', ownerId: user.uid, ownerName: 'S2 detail member', categoryId, version: 1, status: 'ready', totalBytes: bytes.length, textFileCount: 0, imageCount: 0, eegCount: 1, submissionHash: digest(Buffer.from(title + meta.sha256)), createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
   batch.set(database.doc(`packs/${packId}/groups/0`), { version: 1, slots: ['0'], totalBytes: bytes.length, textCount: 0, imageCount: 0, eegCount: 1, files: { '0': meta } });
   batch.set(database.doc(`packs/${packId}/groups/1`), { version: 1, slots: [], totalBytes: 0, textCount: 0, imageCount: 0, eegCount: 0, files: {} });
@@ -47,6 +49,10 @@ test.afterAll(async () => {
   for (const saved of owned) {
     await database.recursiveDelete(database.doc('packs/' + saved.packId));
     await database.doc('categories/' + saved.categoryId).delete();
+    await database.doc('categoryKeys/' + saved.categoryId.toLowerCase()).delete();
+    await database.doc('categoryStats/' + saved.categoryId).delete();
+    await database.doc('sparkOperations/category-' + saved.categoryId).delete();
+    await database.doc('sparkOperations/pack-' + saved.packId).delete();
     await database.doc('users/' + saved.uid).delete();
     await identity.deleteUser(saved.uid);
   }

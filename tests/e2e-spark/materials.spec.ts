@@ -34,7 +34,11 @@ async function seedAccount(name = 'S2 material author') {
 async function seedCategory(uid: string) {
   const name = 'S2 category ' + randomUUID(), id = name.toLowerCase();
   categoryIds.add(id);
-  await database.doc('categories/' + id).set({ name, status: 'active', createdBy: uid, createdAt: Timestamp.now() });
+  const batch = database.batch();
+  batch.set(database.doc('categories/' + id), { name, status: 'active', createdBy: uid, createdAt: Timestamp.now() });
+  batch.set(database.doc('categoryKeys/' + name.toLowerCase()), { categoryId: id });
+  batch.set(database.doc('categoryStats/' + id), { packCount: 0, revision: 0, packId: '', operationId: '', kind: 'init', updatedAt: Timestamp.now() });
+  await batch.commit();
   return { id, name };
 }
 async function login(page: Page, email: string, path: string) {
@@ -84,11 +88,13 @@ function watchServices(page: Page) {
   return forbidden;
 }
 test.afterAll(async () => {
-  if (trusted.options.projectId !== projectId || process.env.FIRESTORE_EMULATOR_HOST !== '127.0.0.1:28090') throw new Error('Refusing cleanup outside the isolated S2 project.');
+  if (trusted.options.projectId !== projectId || process.env.FIRESTORE_EMULATOR_HOST !== '127.0.0.1:28090' || process.env.FIREBASE_AUTH_EMULATOR_HOST !== '127.0.0.1:29099') throw new Error('Refusing cleanup outside the isolated S2 project.');
   // Delete only data owned by this file's synthetic accounts, never another test or preview.
   const packs = await database.collection('packs').get();
-  for (const pack of packs.docs) if (accountIds.has(pack.get('ownerId'))) await database.recursiveDelete(pack.ref);
-  for (const id of categoryIds) await database.doc('categories/' + id).delete();
+  for (const pack of packs.docs) if (accountIds.has(pack.get('ownerId'))) { await database.recursiveDelete(pack.ref); await database.doc('sparkOperations/pack-' + pack.id).delete(); }
+  for (const uid of accountIds) for (const saved of (await database.collection('categories').where('createdBy', '==', uid).get()).docs) categoryIds.add(saved.id);
+  for (const saved of (await database.collection('categoryKeys').get()).docs) if (categoryIds.has(saved.get('categoryId'))) await saved.ref.delete();
+  for (const id of categoryIds) { await database.doc('categories/' + id).delete(); await database.doc('categoryStats/' + id).delete(); await database.doc('sparkOperations/category-' + id).delete(); }
   for (const uid of accountIds) { await database.doc('users/' + uid).delete(); await identity.deleteUser(uid); }
   await deleteApp(trusted);
 });

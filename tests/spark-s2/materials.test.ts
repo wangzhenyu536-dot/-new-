@@ -6,7 +6,7 @@ import { Bytes, collection, doc, getDoc, getDocs, query, setDoc, Timestamp, wher
 import { workbook } from '../fixtures/workbooks.mjs';
 import {
   S2_PROJECT, S2_FIRESTORE_PORT, MAX_FILE_BYTES, MAX_PACK_BYTES, SEARCH_INDEX_BYTES,
-  binaryFile, originalFile, bundleFromFiles, packBundle, commitBundle, addBundle, createOnce, seedProfiles,
+  binaryFile, originalFile, bundleFromFiles, packBundle, commitBundle, addBundle, addCreationStat, createOnce, seedProfiles,
   type PackBundle,
 } from './fixtures';
 
@@ -74,7 +74,7 @@ describe('S2 formal pack creation, attribution, category, and trusted time', () 
   });
   it('accepts an existing active category whose canonical ID contains 60 Chinese characters', async () => {
     const categoryId = '脑'.repeat(60);
-    await trusted(db => setDoc(doc(db, 'categories', categoryId), { name: categoryId, status: 'active', createdBy: 'owner', createdAt: Timestamp.fromMillis(1) }));
+    await trusted(async db => {const batch=writeBatch(db);batch.set(doc(db,'categories',categoryId),{name:categoryId,status:'active',createdBy:'owner',createdAt:Timestamp.fromMillis(1)});batch.set(doc(db,'categoryStats',categoryId),{packCount:0,revision:0,packId:'',operationId:'',kind:'init',updatedAt:Timestamp.fromMillis(1)});batch.set(doc(db,'categoryKeys',categoryId),{categoryId});await batch.commit();});
     const bundle = packBundle(3, 128, { categoryId });
     await assertSucceeds(commitBundle(client('owner'), bundle));
     expect((await getDoc(rootRef(client('viewer'), bundle.id))).get('categoryId')).toBe(categoryId);
@@ -162,7 +162,7 @@ describe('S2 preserves original bytes and agreed attachment limits', () => {
   it('rejects 13 attachments and an undeclared thirteenth file', async () => {
     await rejectWithoutResidue(packBundle(13));
     const bundle = packBundle(), db = client('owner'), batch = writeBatch(db);
-    addBundle(batch, db, bundle); batch.set(doc(db, 'packs', bundle.id, 'files', '12'), binaryFile(12, 'eeg'));
+    addBundle(batch, db, bundle); addCreationStat(batch, db, bundle); batch.set(doc(db, 'packs', bundle.id, 'files', '12'), binaryFile(12, 'eeg'));
     await assertFails(batch.commit()); await assertNoResidue(bundle.id);
   });
   it('rejects no Excel or neither nonblank body nor TXT', async () => {
@@ -191,7 +191,7 @@ describe('S2 atomic attachment manifests cannot publish partial or forged origin
     await assertFails(setDoc(rootRef(client('owner'), rootOnly.id), rootOnly.pack));
     await assertNoResidue(rootOnly.id);
     const bundle = bundleFromFiles([binaryFile(0, 'eeg')]), db = client('owner'), batch = writeBatch(db);
-    addBundle(batch, db, bundle); batch.set(doc(db, 'packs', bundle.id, 'files', '5'), binaryFile(5, 'image'));
+    addBundle(batch, db, bundle); addCreationStat(batch, db, bundle); batch.set(doc(db, 'packs', bundle.id, 'files', '5'), binaryFile(5, 'image'));
     await assertFails(batch.commit()); await assertNoResidue(bundle.id);
   });
   it('rejects missing or wrong slot IDs, duplicate group slots, unlisted manifest keys, and version mismatch', async () => {

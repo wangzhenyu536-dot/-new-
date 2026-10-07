@@ -3,14 +3,14 @@ import {existsSync,mkdirSync,writeFileSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=fileURLToPath(new URL('..',import.meta.url)),mode=process.argv[2]||'verify';
-if(!['rules','e2e','verify','red','start','transitions','s2-rules','s2-e2e','s2'].includes(mode))throw new Error('Use rules, e2e, verify, red or start.');
-const stage=mode.startsWith('s2')?'S2':'S1';
+if(!['rules','e2e','verify','red','start','transitions','s2-rules','s2-e2e','s2','s3-rules','s3-e2e','s3','s4-rules','s4-e2e','s4-regression','s4'].includes(mode))throw new Error('Use rules, e2e, verify, red or start.');
+const stage=mode.startsWith('s4')?'S4':mode.startsWith('s3')?'S3':mode.startsWith('s2')?'S2':'S1';
 const preview=mode==='start',project=preview?'demo-evertrace-spark':'demo-evertrace-spark-test';
 const temporary=path.join(root,preview?'.runtime/sp':'.runtime/st'),working=path.join(root,preview?'.runtime/spark-preview-run':'.runtime/spark-test-run');
 for(const directory of [temporary,working,path.join(root,'outputs',stage)])mkdirSync(directory,{recursive:true});
 const env={...process.env,PATH:path.join(root,'node_modules/.bin')+path.delimiter+(process.env.PATH||''),TMPDIR:temporary,TMP:temporary,TEMP:temporary,METADATA_SERVER_DETECTION:'none',FIREBASE_EMULATORS_PATH:path.join(root,'.cache/firebase')};
 for(const key of Object.keys(env))if(key.endsWith('_EMULATOR_HOST'))delete env[key];
-env.SPARK_STAGE=mode.startsWith('s2')?'S2':'S1';
+env.SPARK_STAGE=stage;
 env.SPARK_S1_BOOTSTRAP_RED=mode==='red'?'1':'0';
 const java=path.join(root,'.runtime/java');if(existsSync(path.join(java,'bin/java'))){env.JAVA_HOME=java;env.PATH=path.join(java,'bin')+path.delimiter+env.PATH;}
 const quote=value=>"'"+value.replaceAll("'","'\"'\"'")+"'";

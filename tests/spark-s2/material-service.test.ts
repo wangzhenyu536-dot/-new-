@@ -2,7 +2,7 @@ import {readFileSync} from 'node:fs';
 import {afterAll,beforeAll,beforeEach,expect,it} from 'vitest';
 import {initializeTestEnvironment,type RulesTestEnvironment,type RulesTestContext} from '@firebase/rules-unit-testing';
 import {Bytes,collection,doc,getDocs,serverTimestamp,setDoc,type Firestore} from 'firebase/firestore';
-import {seedS1,S1_PROJECT,S1_FIRESTORE_PORT} from '../spark-s1/fixtures';
+import {seedS1, seedCategoryState,S1_PROJECT,S1_FIRESTORE_PORT} from '../spark-s1/fixtures';
 import {workbook} from '../fixtures/workbooks.mjs';
 import {saveSparkMaterials,readSparkPack,readSparkFile,listSparkPacks,type SparkInput,type SparkAttempt} from '../../apps/web/src/services/spark-materials';
 let env:RulesTestEnvironment;
@@ -10,7 +10,7 @@ const modular=(context:RulesTestContext)=>(context.firestore() as unknown as {_d
 const client=(uid:string)=>modular(env.authenticatedContext(uid,{email:`${uid}@example.test`}));
 const trusted=(action:(db:Firestore)=>Promise<void>)=>env.withSecurityRulesDisabled(context=>action(modular(context)));
 beforeAll(async()=>{if(process.env.FIRESTORE_EMULATOR_HOST!==`127.0.0.1:${S1_FIRESTORE_PORT}`)throw new Error('S2 requires isolated test Firestore');env=await initializeTestEnvironment({projectId:S1_PROJECT,firestore:{host:'127.0.0.1',port:S1_FIRESTORE_PORT,rules:readFileSync('firebase/spark.rules','utf8')}});});
-beforeEach(async()=>{await env.clearFirestore();await trusted(async db=>{await seedS1(db);await setDoc(doc(db,'categories','focus training'),{name:'Focus Training',status:'active',createdBy:'member',createdAt:serverTimestamp()});});});
+beforeEach(async()=>{await env.clearFirestore();await trusted(async db=>{await seedS1(db);await seedCategoryState(db,'focus training','Focus Training');});});
 afterAll(async()=>{await env?.clearFirestore();await env?.cleanup();});
 async function input():Promise<SparkInput>{return {title:'Synthetic S2 original service',categoryId:'focus training',textContent:'Notes kept exactly.\n设备原始值',attachments:[{kind:'eeg',file:new File([Uint8Array.from(await workbook()).buffer],'original.xlsx')},{kind:'text',file:new File(['TXT original\n第二成员'],'original.txt')}]};}
 const count=async()=>{let result=0;await trusted(async db=>{result=(await getDocs(collection(db,'packs'))).size;});return result;};

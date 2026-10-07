@@ -86,8 +86,15 @@ export function addBundle(writer: BundleWriter, db: Firestore, bundle: PackBundl
     writer.set(doc(db, 'packs', bundle.id, 'files', file.slot), file);
   }
 }
-export function commitBundle(db: Firestore, bundle: PackBundle, omit?: Parameters<typeof addBundle>[3]): Promise<void> {
-  const batch = writeBatch(db); addBundle(batch, db, bundle, omit); return batch.commit();
+export function addCreationStat(writer: BundleWriter, db: Firestore, bundle: PackBundle, previous: {packCount?:number;revision?:number} = {}): void {
+  // Empty category IDs cannot form a ledger path; submit the malformed root and manifests so rules reject them.
+  if (!bundle.pack.categoryId) return;
+  writer.set(doc(db, 'categoryStats', bundle.pack.categoryId), { packCount: (previous.packCount ?? 0) + 1,
+    revision: (previous.revision ?? 0) + 1, packId: bundle.id, operationId: bundle.pack.submissionHash, kind: 'createPack', updatedAt: serverTimestamp() });
+}
+export async function commitBundle(db: Firestore, bundle: PackBundle, omit?: Parameters<typeof addBundle>[3]): Promise<void> {
+  const previous = bundle.pack.categoryId ? (await getDocFromServer(doc(db, 'categoryStats', bundle.pack.categoryId))).data() ?? {} : {};
+  const batch = writeBatch(db); addBundle(batch, db, bundle, omit); addCreationStat(batch, db, bundle, previous); await batch.commit();
 }
 // Rule-level transaction fixture; production helper and browser paths are independently tested.
 export async function createOnce(db: Firestore, bundle: PackBundle): Promise<{ id: string; created: boolean }> {
@@ -101,7 +108,8 @@ export async function createOnce(db: Firestore, bundle: PackBundle): Promise<{ i
         }
         return { id: bundle.id, created: false };
       }
-      addBundle(transaction, db, bundle);
+      const previous = bundle.pack.categoryId ? (await transaction.get(doc(db, 'categoryStats', bundle.pack.categoryId))).data() ?? {} : {};
+      addBundle(transaction, db, bundle); addCreationStat(transaction, db, bundle, previous);
       return { id: bundle.id, created: true };
     });
   } catch (error) {
@@ -128,6 +136,10 @@ export async function seedProfiles(db: Firestore): Promise<void> {
     name: status[0].toUpperCase() + status.slice(1), status: status === 'other' ? 'active' : status,
     createdBy: 'owner', createdAt: Timestamp.fromMillis(1),
   });
+  for (const id of ['active', 'other', 'migrating', 'deleted']) {
+    batch.set(doc(db, 'categoryStats', id), { packCount: 0, revision: 0, packId: '', operationId: '', kind: 'init', updatedAt: Timestamp.fromMillis(1) });
+    batch.set(doc(db, 'categoryKeys', id), { categoryId: id });
+  }
   batch.set(doc(db, 'system', 'roles'), { adminCount: 1, revision: 0, changedUid: '', fromRole: 'member', toRole: 'member', operationId: '' });
   await batch.commit();
 }

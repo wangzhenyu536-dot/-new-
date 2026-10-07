@@ -311,7 +311,11 @@
     "noMatches": "No skill packs match these filters.",
     "loadingMore": "Loading more skill packs…",
     "invalidFilters": "These filters are invalid. Clear them or shorten the title prefix and try again.",
-    "categoryLoadError": "Could not load category filters. Your list and search are still available."
+    "categoryLoadError": "Could not load category filters. Your list and search are still available.",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "pageNumber": "Page {{page}}",
+    "pagination": "Skill pack pages"
   },
   "wave": {
     "zoomIn": "Zoom in",
@@ -394,7 +398,12 @@
     "categoryCountMismatch": "The category count needs verification. Deletion has stopped and the remaining references are preserved.",
     "packCount_one": "{{count}} skill pack",
     "moved_one": "{{count}} skill pack moved",
-    "permissionDenied": "You no longer have permission to perform this operation. Reload the page to check your access."
+    "permissionDenied": "You no longer have permission to perform this operation. Reload the page to check your access.",
+    "categoryRenamed": "Category name updated. Its skill packs stay in the same category.",
+    "categoryChanged": "This category name changed after you opened it. Cancel, reload and review the current name.",
+    "operationChanged": "This operation changed. Reload the page before continuing.",
+    "baselineRequired": "Category records need to be prepared before management can continue. Your materials are preserved.",
+    "notFound": "These materials or this category are no longer available. Reload the latest list."
   },
   "members": {
     "hint": "Manage community access. Administrators can manage all skill packs, categories and member roles. Members can manage their own skill packs and view community materials.",
@@ -424,13 +433,13 @@
   },
   "spark": {
     "workspaceTitle": "Community workspace",
-    "workspaceHint": "Create a skill pack, explore community materials and download their original files. Categories are shared by the community.",
+    "workspaceHint": "Create, edit and manage your skill packs, filter community materials, and download originals, waveform PNGs or complete ZIPs.",
     "categoriesTitle": "Community categories",
     "categoriesHint": "Every member can create a category. Categories are shared across the community; repeated names reuse the existing category.",
-    "available": "Accounts, shared categories, saving and viewing original materials are ready.",
-    "next": "Editing, filters, complete exports and management will be added in the next updates.",
+    "available": "Accounts, shared categories, materials, complete exports and management are ready.",
+    "next": "Free cloud setup and the final checks follow in the next update.",
     "upcomingTitle": "This workspace feature is coming next",
-    "upcomingHint": "Creating and viewing skill packs are ready. Editing, filters, complete exports and management are being completed.",
+    "upcomingHint": "Community materials and management are ready. Free cloud setup is being prepared.",
     "categoryAdded": "Category created.",
     "categoryExists": "This category already exists."
   },
@@ -443,6 +452,8 @@
     "preparing": "Preparing original files…",
     "committing": "Saving all materials together… This step cannot be cancelled.",
     "cancel": "Cancel saving",
-    "cancelled": "Save cancelled. Your inputs and selected files are kept; save again when ready."
+    "cancelled": "Save cancelled. Your inputs and selected files are kept; save again when ready.",
+    "retained": "Keeping the saved original.",
+    "replacement": "Pending replacement of {{name}}."
   }
 }

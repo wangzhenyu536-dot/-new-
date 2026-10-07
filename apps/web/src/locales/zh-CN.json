@@ -310,7 +310,11 @@
     "noMatches": "没有符合当前筛选条件的技能包。",
     "loadingMore": "正在加载更多技能包…",
     "invalidFilters": "筛选条件无效，请清除筛选或缩短标题前缀后重试。",
-    "categoryLoadError": "分类筛选加载失败，资料列表和标题搜索仍可使用。"
+    "categoryLoadError": "分类筛选加载失败，资料列表和标题搜索仍可使用。",
+    "previousPage": "上一页",
+    "nextPage": "下一页",
+    "pageNumber": "第 {{page}} 页",
+    "pagination": "技能包分页"
   },
   "wave": {
     "zoomIn": "放大",
@@ -391,7 +395,12 @@
     "targetRequired": "请先选择技能包的目标分类，再删除此分类。",
     "deletePending": "此分类中的技能包仍在删除，请先完成清理。",
     "categoryCountMismatch": "分类数量需要核对，删除已停止并保留剩余引用。",
-    "permissionDenied": "你已无权执行此操作，请重新加载页面确认当前权限。"
+    "permissionDenied": "你已无权执行此操作，请重新加载页面确认当前权限。",
+    "categoryRenamed": "分类名称已更新，技能包仍属于同一分类。",
+    "categoryChanged": "此分类名称已发生变化。请取消、重新加载并确认当前名称。",
+    "operationChanged": "此操作已发生变化，请重新加载页面后再继续。",
+    "baselineRequired": "分类记录需要准备完成后才能继续管理，现有资料已保留。",
+    "notFound": "这些资料或此分类已不可用，请重新加载最新列表。"
   },
   "members": {
     "hint": "管理社区权限。管理员可以管理全部技能包、分类和成员角色；普通成员可以管理自己的技能包，并查看社区资料。",
@@ -419,13 +428,13 @@
   },
   "spark": {
     "workspaceTitle": "社区工作区",
-    "workspaceHint": "创建技能包，查看社区资料并下载原文件。分类由社区共享。",
+    "workspaceHint": "创建、编辑和管理自己的技能包，筛选社区资料并下载原件、波形 PNG 或完整 ZIP。",
     "categoriesTitle": "社区分类",
     "categoriesHint": "每位成员都可以创建分类。分类供社区共同使用；重名时沿用已有分类。",
-    "available": "账户、共享分类、原件保存与查看已就绪。",
-    "next": "后续更新将加入编辑、筛选、完整导出和管理功能。",
+    "available": "账户、共享分类、资料、完整导出和管理功能已就绪。",
+    "next": "后续更新将完成免费云端配置与最终检查。",
     "upcomingTitle": "此工作区功能将在后续更新开放",
-    "upcomingHint": "技能包创建与查看已就绪。编辑、筛选、完整导出和管理功能正在完善。",
+    "upcomingHint": "社区资料和管理功能已就绪，正在准备免费云端配置。",
     "categoryAdded": "分类已创建。",
     "categoryExists": "该分类已存在。"
   },
@@ -438,6 +447,8 @@
     "preparing": "正在准备原文件…",
     "committing": "正在一起保存全部材料… 此阶段无法取消。",
     "cancel": "取消保存",
-    "cancelled": "已取消保存。输入和所选文件仍保留，可再次保存。"
+    "cancelled": "已取消保存。输入和所选文件仍保留，可再次保存。",
+    "retained": "保留已保存的原件。",
+    "replacement": "待保存：替换原件 {{name}}。"
   }
 }

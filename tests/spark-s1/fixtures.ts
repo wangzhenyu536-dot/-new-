@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { doc, getDoc, runTransaction, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
+import { doc, getDoc, getDocFromServer, runTransaction, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
 
 export const S1_PROJECT = 'demo-evertrace-spark-test';
 export const S1_FIRESTORE_PORT = 28090;
@@ -13,6 +13,15 @@ export async function seedS1(db: Firestore, administrators = 1): Promise<void> {
   batch.set(doc(db, 'system', 'roles'), { adminCount: administrators, revision: 0,
     changedUid: '', fromRole: 'member', toRole: 'member', operationId: '' });
   await batch.commit();
+}
+
+export async function commitCategoryRecords(db: Firestore, id: string, data: Record<string, unknown>): Promise<void> {
+  const name=String(data.name),key=name && !name.includes('/') && !['.','..'].includes(name) ? name.toLowerCase() : id;
+  const batch=writeBatch(db);batch.set(doc(db,'categories',id),data);batch.set(doc(db,'categoryKeys',key),{categoryId:id});
+  batch.set(doc(db,'categoryStats',id),{packCount:0,revision:0,packId:'',operationId:'',kind:'init',updatedAt:serverTimestamp()});await batch.commit();
+}
+export async function seedCategoryState(db: Firestore, id: string, name: string, createdBy='member'): Promise<void> {
+  await commitCategoryRecords(db,id,{name,status:'active',createdBy,createdAt:serverTimestamp()});
 }
 
 // These builders exercise the real SDK and rules. They are test fixtures, not the app's future data adapter.
@@ -29,16 +38,33 @@ export function canonicalCategory(raw: string): string {
   return raw.trim().replace(/\s+/gu, ' ');
 }
 export async function createCategoryTransaction(db: Firestore, uid: string, raw: string) {
-  const name = canonicalCategory(raw), id = name.toLowerCase(), target = doc(db, 'categories', id);
-  return runTransaction(db, async transaction => {
-    const existing = await transaction.get(target);
-    if (existing.exists()) {
-      if (existing.get('status') !== 'active') throw new Error('Category unavailable');
-      return { id, name: existing.get('name') as string, created: false };
-    }
-    transaction.set(target, { name, status: 'active', createdBy: uid, createdAt: serverTimestamp() });
-    return { id, name, created: true };
-  });
+  const name = canonicalCategory(raw), id = name.toLowerCase(), key = doc(db,'categoryKeys',id), target = doc(db, 'categories', id);
+  try {
+    return await runTransaction(db, async transaction => {
+      await transaction.get(key);
+      const existing = await transaction.get(target);
+      if (existing.exists()) {
+        if (existing.get('status') !== 'active') throw new Error('Category unavailable');
+        return { id, name: existing.get('name') as string, created: false };
+      }
+      transaction.set(target, { name, status: 'active', createdBy: uid, createdAt: serverTimestamp() });
+      transaction.set(key,{categoryId:id});transaction.set(doc(db,'categoryStats',id),{packCount:0,revision:0,packId:'',operationId:'',kind:'init',updatedAt:serverTimestamp()});
+      return { id, name, created: true };
+    });
+  } catch (error) {
+    // Immutable concurrent creates can lose their acknowledgement or return PERMISSION_DENIED.
+    // Only a matching server registry, active canonical category and real ledger confirm success.
+    try {
+      const [registry,category,stat] = await Promise.all([getDocFromServer(key),getDocFromServer(target),getDocFromServer(doc(db,'categoryStats',id))]);
+      if (registry.exists() && registry.get('categoryId') === id && category.exists() && category.get('status') === 'active'
+        && typeof category.get('name') === 'string' && canonicalCategory(category.get('name')).toLowerCase() === id
+        && stat.exists() && Number.isSafeInteger(stat.get('packCount')) && Number(stat.get('packCount')) >= 0
+        && Number.isSafeInteger(stat.get('revision')) && Number(stat.get('revision')) >= 0) {
+        return { id, name: category.get('name') as string, created: false };
+      }
+    } catch { /* Preserve the original failure if the committed result cannot be verified. */ }
+    throw error;
+  }
 }
 
 export async function roleTransaction(db: Firestore, actorId: string, uid: string, toRole: Role,

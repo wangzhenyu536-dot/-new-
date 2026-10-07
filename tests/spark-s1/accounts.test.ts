@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestContext, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { collection, deleteDoc, doc, getDoc, getDocs, serverTimestamp, setDoc, Timestamp, type Firestore } from 'firebase/firestore';
-import { S1_PROJECT, S1_FIRESTORE_PORT, profile, seedS1, initializeOwnMember, createCategoryTransaction, roleTransaction, readRole } from './fixtures';
+import { S1_PROJECT, S1_FIRESTORE_PORT, profile, seedS1, initializeOwnMember, createCategoryTransaction, roleTransaction, readRole, commitCategoryRecords } from './fixtures';
 
 let env: RulesTestEnvironment;
 // Official modular SDK calls use the delegate of rules-unit-testing's compat context.
@@ -140,8 +140,8 @@ describe('S1 shared category transactions with canonical unique IDs', () => {
     expect(snapshot.exists()).toBe(false);
   });
   it('creates an active category with its creator and server time and lets another member read and list it', async () => {
-    const db = client('member'), target = doc(db, 'categories', 'brain data');
-    await assertSucceeds(setDoc(target, categoryData('Brain Data')));
+    const db = client('member');
+    await assertSucceeds(commitCategoryRecords(db,'brain data',categoryData('Brain Data')));
     const snapshot = await assertSucceeds(getDoc(doc(client('viewer'), 'categories', 'brain data')));
     expect(snapshot.data()).toMatchObject({ name: 'Brain Data', status: 'active', createdBy: 'member' });
     expect(snapshot.get('createdAt')).toBeInstanceOf(Timestamp);
@@ -170,7 +170,7 @@ describe('S1 shared category transactions with canonical unique IDs', () => {
   it('refuses category create, get, and list by anonymous or authenticated identities without a member profile', async () => {
     await trusted(db => setDoc(doc(db, 'categories', 'existing'), { name: 'Existing', status: 'active', createdBy: 'admin', createdAt: Timestamp.fromMillis(1) }));
     for (const db of [anonymous(), client('unregistered')]) {
-      await assertFails(setDoc(doc(db, 'categories', 'new category'), categoryData('New Category', 'unregistered')));
+      await assertFails(commitCategoryRecords(db,'new category',categoryData('New Category','unregistered')));
       await assertFails(getDoc(doc(db, 'categories', 'existing')));
       await assertFails(getDocs(collection(db, 'categories')));
     }
@@ -184,19 +184,19 @@ describe('S1 shared category transactions with canonical unique IDs', () => {
       (data: Record<string, unknown>) => { data.normalizedName = 'forged'; },
     ]) {
       const data: Record<string, unknown> = categoryData('Brain Data'); mutate(data);
-      await assertFails(setDoc(doc(db, 'categories', 'brain data'), data));
+      await assertFails(commitCategoryRecords(db,'brain data',data));
     }
   });
   it('rejects a nonlowercase or mismatching category document ID', async () => {
     const db = client('member');
-    await assertFails(setDoc(doc(db, 'categories', 'Brain Data'), categoryData('Brain Data')));
-    await assertFails(setDoc(doc(db, 'categories', 'unrelated name'), categoryData('Brain Data')));
-    await assertSucceeds(setDoc(doc(db, 'categories', '分类 a'), categoryData('分类 A')));
+    await assertFails(commitCategoryRecords(db,'Brain Data',categoryData('Brain Data')));
+    await assertFails(commitCategoryRecords(db,'unrelated name',categoryData('Brain Data')));
+    await assertSucceeds(commitCategoryRecords(db,'分类 a',categoryData('分类 A')));
     expect((await getDoc(doc(client('viewer'), 'categories', '分类 a'))).get('name')).toBe('分类 A');
   });
   it('rejects noncanonical whitespace even when the document ID matches the malformed lowercase name', async () => {
     for (const name of [' Brain', 'Brain ', 'Brain  Data', 'Brain\tData', 'Brain\nData', 'Brain\u00a0Data', 'Brain\u2003Data']) {
-      await assertFails(setDoc(doc(client('member'), 'categories', name.toLowerCase()), categoryData(name)));
+      await assertFails(commitCategoryRecords(client('member'),name.toLowerCase(),categoryData(name)));
     }
   });
   it('rejects empty, oversized, reserved dot, slash, and backslash category names', async () => {
@@ -204,15 +204,15 @@ describe('S1 shared category transactions with canonical unique IDs', () => {
     for (const name of ['', ' ', 'x'.repeat(61), '.', '..', 'Bad/Name', 'Bad\\Name']) {
       // Path separators/reserved names use a safe forged ID so the request reaches security rules.
       const id = name.includes('/') || name === '' || name === '.' || name === '..' ? `invalid-${randomUUID()}` : name.toLowerCase();
-      await assertFails(setDoc(doc(db, 'categories', id), categoryData(name)));
+      await assertFails(commitCategoryRecords(db,id,categoryData(name)));
     }
   });
   it('rejects category overwrites and deletes by members and administrators at this stage', async () => {
     const creator = client('member');
-    await assertSucceeds(setDoc(doc(creator, 'categories', 'brain data'), categoryData('Brain Data')));
+    await assertSucceeds(commitCategoryRecords(creator,'brain data',categoryData('Brain Data')));
     for (const uid of ['member', 'admin']) {
       const target = doc(client(uid), 'categories', 'brain data');
-      await assertFails(setDoc(target, categoryData('BRAIN DATA', uid)));
+      await assertFails(commitCategoryRecords(client(uid),'brain data',categoryData('BRAIN DATA',uid)));
       await assertFails(deleteDoc(target));
     }
     expect((await getDoc(doc(creator, 'categories', 'brain data'))).get('name')).toBe('Brain Data');
